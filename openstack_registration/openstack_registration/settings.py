@@ -127,8 +127,15 @@ LOGOUT_URL = '/logout:'
 LOGIN_REDIRECT_URL = '/'
 STATIC_URL = '/static/'
 GLOBAL_CONFIG = {}
+
+# Allow user to have a specific configuration file on there $HOME
+if os.path.isfile(os.path.expanduser('~') + '/.register.cfg'):
+    configuration_file = os.path.expanduser('~') + '/.register.cfg'
+else:
+    configuration_file = '/etc/register.cfg'
+
 config = ConfigParser.RawConfigParser()
-config.read('/etc/register.cfg')
+config.read(configuration_file)
 
 GLOBAL_CONFIG['LDAP_SERVER'] = config.get('LDAP', 'server')
 GLOBAL_CONFIG['LDAP_USER'] = config.get('LDAP', 'bind_dn')
