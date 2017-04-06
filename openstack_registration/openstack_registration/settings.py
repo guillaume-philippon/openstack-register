@@ -156,10 +156,6 @@ GLOBAL_CONFIG['DEBUG_LVL'] = config.get('MAIN', 'debug_lvl')
 AUTH_LDAP_SERVER_URI = config.get('AUTH', 'server')
 AUTH_LDAP_BIND_DN = config.get('AUTH', 'bind_dn')
 AUTH_LDAP_BIND_PASSWORD = config.get('AUTH', 'password')
-# AUTH_LDAP_USER_SEARCH = LDAPSearch(config.get('AUTH',
-#                                               'user_search'),
-#                                    ldap.SCOPE_SUBTREE,
-#                                    "(samaccountname=%(user)s)")
 AUTH_LDAP_USER_SEARCH = LDAPSearch(config.get('AUTH',
                                               'user_search'),
                                    ldap.SCOPE_SUBTREE,
