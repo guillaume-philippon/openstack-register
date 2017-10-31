@@ -1,16 +1,18 @@
-#!/usr/local/bin/python2.7
+"""
+Registration view
+"""
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponseRedirect, QueryDict
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
-from openstack_registration.settings import GLOBAL_CONFIG
-from Backend import OpenLdap
-from registration.exceptions import InvalidX500DN
-from registration.utils import *
-import urllib2
 
+from openstack_registration.settings import GLOBAL_CONFIG
+
+from registration.Backend import OpenLdap
+from registration.exceptions import InvalidX500DN
+from registration.utils import *  # pylint: disable=unused-wildcard-import, wildcard-import
 
 LOGGER = logging.getLogger("registration")
 LOGGER_ERROR = logging.getLogger("registration_error")
@@ -18,11 +20,11 @@ LOGGER_ERROR = logging.getLogger("registration_error")
 
 def user_is_authenticate(request):
     """
-
-    :param request:
-    :return:
+    Return the status of current user
+    :param request: Web request
+    :return: JSonResponse
     """
-    data = {}
+    data = dict()
     data['status'] = 'False'
     if request.user.is_authenticated():
         data['status'] = 'True'
@@ -31,21 +33,20 @@ def user_is_authenticate(request):
 
 
 @login_required()
-def user_is_admin(request,
-                  spec=None):
+def user_is_admin(request, spec=None):
     """
-
-    :param request:
-    :return:
+    Return True if user is a administrator
+    :param request: Web request
+    :return: JSonResponse
     """
-    data = {}
+    data = dict()
     data['admin'] = 'False'
-    user = UserInfo.objects.filter(username=request.user)
+    user = UserInfo.objects.filter(username=request.user)  # pylint: disable=no-member
 
     if spec == 'dataTable':
         data['list'] = {}
         final_list = []
-        admin = UserInfo.objects.filter(admin=True)
+        admin = UserInfo.objects.filter(admin=True)  # pylint: disable=no-member
 
         for each in admin:
             tmp = {}
@@ -78,26 +79,32 @@ def user_is_admin(request,
             data['admin'] = 'True'
     if spec == 'python':
         return data
-    else:
-        return JsonResponse(data)
+    return JsonResponse(data)
 
 
 @login_required()
 def logs_dispatcher(request):
+    """
+    make desc.
+    :param request: Web request
+    :return: void
+    """
     if user_is_admin(request, spec='python')['admin'] != 'False':
         if request.method == 'GET'\
                 and 'version' in request.GET:
-             return logs_get_json(request)
-        else:
-            return logs_get_html(request)
-    else:
-        return redirect('/')
+            return logs_get_json(request)
+        return logs_get_html(request)
+    return redirect('/')
 
 
 @login_required()
 def logs_get_json(request):
-    # pass
-    data = {}
+    """
+    Return the log file
+    :param request: Web request
+    :return: void
+    """
+    data = dict()
     log_file = open(GLOBAL_CONFIG['LOG_DIR'] + "/registration.log", "r")
     lines = log_file.readlines()
     log_file.close()
@@ -105,112 +112,105 @@ def logs_get_json(request):
     filtered = ''
 
     if 'filter' in request.GET and request.GET['filter'] != '':
-        # search = str(request.GET['filter'].lower().encode('utf-8'))
         search = str(request.GET['filter'].encode('utf-8'))
         if version == 'actions':
             for line in lines:
-                # if line.lower().__contains__(search)\
-                #         and line.__contains__("CREATED")\
-                #         or line.lower().__contains__(search)\
-                #         and line.__contains__("MODIFIED")\
-                #         or line.lower().__contains__(search)\
-                #         and line.__contains__("CONNECTED"):
-                if line.__contains__(search)\
+                if line.__contains__(search) \
                         and (line.__contains__("CREATED")
-                        or line.__contains__("MODIFIED")
-                        or line.__contains__("LOGOUT")
-                        or line.__contains__("LOGIN")):
+                             or line.__contains__("MODIFIED")
+                             or line.__contains__("LOGOUT")
+                             or line.__contains__("LOGIN")):
                     filtered = line + filtered
         elif version == 'full':
             for line in lines:
-                # if line.lower().__contains__(search):
                 if line.__contains__(search):
                     filtered = line + filtered
     else:
         if version == 'actions':
             for each in lines:
-                if each.__contains__("CREATE") or each.__contains__("MODIFIED") or each.__contains__("LOGIN") or each.__contains__("LOGOUT"):
+                if each.__contains__("CREATE") \
+                        or each.__contains__("MODIFIED") \
+                        or each.__contains__("LOGIN") \
+                        or each.__contains__("LOGOUT"):
                     filtered = each + filtered
         elif version == 'full':
             for each in lines:
                 filtered = each + filtered
-
     data['logs'] = filtered
     return JsonResponse(data)
 
 
 @login_required()
 def logs_get_html(request):
+    """
+    Get log on HTML
+    :param request: Web request
+    :return: void
+    """
     return render(request, 'logs_get_html.html')
 
 
 @login_required()
-def admin_dispatcher(request):
+def admin_dispatcher(request):  # pylint: disable=too-many-return-statements
     """
-
-    :param request:
-    :return:
+    Admin view dispatcher
+    :param request: Web request
+    :return: void
     """
     if user_is_admin(request, spec='python')['admin'] != 'False':
         if request.method == 'GET':
-            if 'format' in request.GET\
-                and 'email' in request.GET\
-                and request.GET['format'] == 'json'\
-                and request.GET['email'] == 'bar':
+            if 'format' in request.GET \
+                    and 'email' in request.GET \
+                    and request.GET['format'] == 'json' \
+                    and request.GET['email'] == 'bar':
                 return user_get_json(request)
-            elif 'format' in request.GET\
-                and 'spec' in request.GET\
-                and request.GET['format'] == 'json'\
-                and request.GET['spec'] == 'dataTable':
+            elif 'format' in request.GET \
+                    and 'spec' in request.GET \
+                    and request.GET['format'] == 'json' \
+                    and request.GET['spec'] == 'dataTable':
                 return user_is_admin(request, spec='dataTable')
-            elif 'format' in request.GET\
-                and request.GET['format'] == 'json':
+            elif 'format' in request.GET \
+                    and request.GET['format'] == 'json':
                 return admin_get_json(request)
-            else:
-                # if str(request.path) == '/admin/users/':
-                #     return users_get_html(request)
-                # else:
-                return admin_get_html(request)
+            return admin_get_html(request)
         elif request.method == 'PUT':
             return admin_put_json(request)
         elif request.method == 'POST':
             return admin_post_json(request)
-    else:
-        return redirect('/')
+    return redirect('/')
 
 
 @login_required()
-def admin_users_dispatcher(request):
+def admin_users_dispatcher(request):  # pylint: disable=too-many-return-statements
     """
-
-    :param request:
-    :return:
+    TODO: need dispatcher
+    :param request: Web request
+    :return: void
     """
     if user_is_admin(request, spec='python')['admin'] != 'False':
-        ldap = OpenLdap(GLOBAL_CONFIG)
+        ldap = OpenLdap()
         if request.method == 'GET':
-            if 'format' in request.GET\
-                    and 'spec' in request.GET\
-                    and request.GET['format'] == 'json'\
+            if 'format' in request.GET \
+                and 'spec' in request.GET \
+                and request.GET['format'] == 'json' \
                     and request.GET['spec'] == 'dataTable':
-                    data = {}
-                    data['users'] = {}
-                    list_users = []
-                    user = {}
-                    users = ldap.search_user(uid="foo", mail="bar", pager="all")
+                data = dict()
+                data['users'] = dict()
+                list_users = []
+                user = dict()
+                users = ldap.search_user(uid="foo", mail="bar", pager="all")
 
-                    for each in users:
-                        user['uid'] = each[1]['uid'][0]
-                        user['mail'] = each[1]['mail'][0]
-                        user['pager'] = { 'pager': each[1]['pager'][0], 'state': '', 'display': ''}
-                        list_users.append(user)
-                        user = {}
-                    data['users'] = list_users
-                    return JsonResponse(data)
-            else:
-                return users_get_html(request)
+                for each in users:
+                    user['uid'] = each[1]['uid'][0]
+                    user['mail'] = each[1]['mail'][0]
+                    user['pager'] = {'pager': each[1]['pager'][0], 'state': '', 'display': ''}
+                    list_users.append(user)
+                    user = dict()
+                data['users'] = list_users
+                return JsonResponse(data)
+            return users_get_html(request)
         elif request.method == 'PUT':
-            info = {}
+            info = dict()
             data = QueryDict(request.body).dict()
             user = str(data['user'])
 
@@ -218,19 +218,21 @@ def admin_users_dispatcher(request):
                 password = str(data['password'])
                 try:
                     attrs = ldap.change_user_password(user, password)
-                    LOGGER.info("USER MODIFIED  :: Operator : %s  :: admin changed %s password by '%s'", request.user, user, password)
+                    LOGGER.info("USER MODIFIED  :: Operator : %s  :: admin changed %s password by"
+                                " '%s'", request.user, user, password)
                     return JsonResponse(attrs)
-                except:
+                except:  # pylint: disable=bare-except
                     info['info'] = 'Fail to change your password.'
                     return render(request, 'error_get_html.html', context=info)
             elif 'action' in data:
                 action = str(data['action'])
                 try:
                     attrs = ldap.modify_user(user, action)
-                    LOGGER.info("USER MODIFIED  :: Operator : %s  :: username=%s password action=%s", request.user, user, action)
+                    LOGGER.info("USER MODIFIED  :: Operator : %s  :: username=%s password"
+                                " action=%s", request.user, user, action)
                     return JsonResponse(attrs)
-                except:
-                    info['info'] = 'Fail to ' + action +' user ' + user +'.'
+                except:  # pylint: disable=bare-except
+                    info['info'] = 'Fail to ' + action + ' user ' + user + '.'
                     return render(request, 'error_get_html.html', context=info)
     else:
         return redirect('/')
@@ -239,12 +241,12 @@ def admin_users_dispatcher(request):
 @login_required()
 def admin_get_json(request):
     """
-
-    :param request:
-    :return:
+    TODO: make description
+    :param request: Web request
+    :return: void
     """
-    data = {}
-    user = UserInfo.objects.filter(username=str(request.user))
+    data = dict()
+    user = UserInfo.objects.filter(username=str(request.user))  # pylint: disable=no-member
     counter = user[0].countForce
     data['counter'] = counter
     return JsonResponse(data)
@@ -253,22 +255,22 @@ def admin_get_json(request):
 @login_required()
 def admin_post_json(request):
     """
-
-    :param request:
-    :return:
+    TODO: make description
+    :param request: Web request
+    :return: void
     """
-    attrs = {}
+    attrs = dict()
     data = QueryDict(request.body).dict()
     group = normalize_string(data['group'])
     desc = normalize_string(data['desc'], option='name')
 
-    if group != unicode(data['group']).encode(encoding='utf-8') or desc != unicode(data['desc']).encode(encoding='utf-8'):
-    # if str(group) != str(data['group']) or str(desc) != str(data['desc']):
+    if group != unicode(data['group']).encode(encoding='utf-8') \
+            or desc != unicode(data['desc']).encode(encoding='utf-8'):
         attrs['group'] = group
         attrs['desc'] = desc
         attrs['status'] = 'change'
     else:
-        ldap = OpenLdap(GLOBAL_CONFIG)
+        ldap = OpenLdap()
         exist = ldap.search_group(uid=group)
 
         if exist != []:
@@ -277,9 +279,10 @@ def admin_post_json(request):
             try:
                 ldap.addGroup(group, desc, request.user)
                 add_entry_group_info(group)
-                LOGGER.info("GROUP CREATED  :: Operator : %s  :: Attributes : name=%s, desc=%s ", request.user, group, desc)
+                LOGGER.info("GROUP CREATED  :: Operator : %s  :: Attributes : name=%s,"
+                            " desc=%s ", request.user, group, desc)
                 attrs['status'] = 'success'
-            except:
+            except:  # pylint: disable=bare-except
                 attrs['status'] = 'fail'
     return JsonResponse(attrs)
 
@@ -291,11 +294,11 @@ def admin_put_json(request):
     :param request:
     :return:
     """
-    ldap = OpenLdap(GLOBAL_CONFIG)
+    ldap = OpenLdap()
     data = QueryDict(request.body).dict()
     user = data['user']
     action = data['action']
-    result = {}
+    result = dict()
     list_admin = []
 
     exist = ldap.search_user(uid=user)
@@ -322,9 +325,11 @@ def admin_put_json(request):
                 value = False
                 update_count_force(request.user, 'remove')
             if value:
-                LOGGER.info("ADMIN MODIFIED :: Operator : %s  :: Attributes : user=%s, action=promote super admin ", request.user, user)
+                LOGGER.info("ADMIN MODIFIED :: Operator : %s  :: Attributes : user=%s,"
+                            " action=promote super admin ", request.user, user)
             else:
-                LOGGER.info("ADMIN MODIFIED :: Operator : %s  :: Attributes : user=%s, action=dismiss super admin ", request.user, user)
+                LOGGER.info("ADMIN MODIFIED :: Operator : %s  :: Attributes : user=%s,"
+                            " action=dismiss super admin ", request.user, user)
             result = update_entry_user_info(user, value)
             return JsonResponse(result)
 
@@ -338,36 +343,35 @@ def admin_get_html(request):
     """
     if user_is_admin(request, spec='python')['admin'] != 'False':
         return render(request, "admin.html")
-    else:
-        return redirect('/')
+    return redirect('/')
 
 
 @login_required()
 def users_get_html(request):
+    """
+    make desc.
+    :param request: Web request
+    :return: void
+    """
     if user_is_admin(request, spec='python')['admin'] != 'False':
         return render(request, "users_get_html.html")
-    else:
-        return redirect('/')
+    return redirect('/')
 
 
 @login_required()
-def user_is_group_admin(request,
-                        type=None):
+def user_is_group_admin(request, type=None):  # pylint: disable=redefined-builtin
     """
-
-    :param request:
-    :param type:
-    :return:
+    make desc.
+    :param request: Web request
+    :param type: ??
+    :return: void
     """
-    data = {}
+    data = dict()
     group_list = []
     user_list = []
     data['status'] = 'False'
     data['admin'] = 'False'
     user_admin = None
-    # print IsAdmin.objects.filter(group__group_name="test-admin2")
-    # print IsAdmin.objects.get(group=)
-    # print IsAdmin.objects.filter(group__group_name="test-admin2")[0].administrators
 
     if request.path_info.split('/')[1] == 'groupAdmin':
         location = request.path_info.split('/')[2]
@@ -391,24 +395,30 @@ def user_is_group_admin(request,
 
     if type == 'python':
         return data
-    else:
-        return JsonResponse(data)
+    return JsonResponse(data)
 
 
 @login_required()
-def modify_group_admin(request,
-                       user,
-                       group,
-                       action):
-    data = {}
+def modify_group_admin(request, user, group, action):
+    """
+    make desc.
+    :param request: Web request
+    :param user: user
+    :param group: group
+    :param action: action
+    :return: void
+    """
+    data = dict()
     data['status'] = 'false'
     if (user_is_admin(request, spec='python')['admin'] != 'False'
             or (user_is_group_admin(request, type='python')['admin'] != 'False'
-            and request.META['HTTP_REFERER'].split('/')[4] in user_is_group_admin(request, type='python')['admin'])):
-        if user_is_admin(request, spec='python')['admin'] == 'False'\
-            and user_is_group_admin(request, type='python')['admin'] != 'False'\
-            and request.META['HTTP_REFERER'].split('/')[4] in user_is_group_admin(request, type='python')['admin']\
-            and str(request.user) == str(user):
+                and request.META['HTTP_REFERER'].split('/')[4]
+                in user_is_group_admin(request, type='python')['admin'])):
+        if user_is_admin(request, spec='python')['admin'] == 'False' \
+                and user_is_group_admin(request, type='python')['admin'] != 'False' \
+                and request.META['HTTP_REFERER'].split('/')[4] \
+                        in user_is_group_admin(request, type='python')['admin'] \
+                and str(request.user) == str(user):
             data['status'] = 'itself'
         else:
             if action == 'add':
@@ -421,54 +431,50 @@ def modify_group_admin(request,
                 data['status'] = 'true'
     if 'action' in data:
         if data['action'] == 'added':
-            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s, action=promote group admin ", request.user, group, user)
+            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s,"
+                        " action=promote group admin ", request.user, group, user)
         elif data['action'] == 'deleted':
-            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s, action=dismiss group admin ", request.user, group, user)
+            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s,"
+                        " action=dismiss group admin ", request.user, group, user)
     return JsonResponse(data)
 
 
 def login(request):
     """
-
-    :param request:
-    :return:
+    TODO: make desc.
+    :param request: Web request
+    :return: void
     """
-    info = {}
+    info = dict()
 
     if request.user.is_authenticated():
         redirect_page = "/users/{}".format(request.user)
         return redirect(redirect_page)
-    else:
-        # response = urllib2.urlopen(request)
-        # print response
-        # print response.info()
-        # print request.response.get()
-
-        if request.method == "POST":
-            user = auth.authenticate(username=request.POST['username'].lower(),
-                                     password=request.POST['password'])
-            if user is not None:
-                redirect_page = "/users/{}".format(request.POST['username'].lower())
-                auth.login(request, user)
-                LOGGER.info("USER LOGIN     :: User %s is connected from %s", request.user, request.META.get('REMOTE_ADDR'))
-                return HttpResponseRedirect(redirect_page)
-            else:
-                info['info'] = 'Your login/password are wrong'
-                LOGGER.info("LOGIN FAILED   :: Attempt to login with user '%s' from %s", request.POST['username'], request.META.get('REMOTE_ADDR'))
-                return render(request, "login.html", context=info)
-        else:
-            return render(request, "login.html")
+    if request.method == "POST":
+        user = auth.authenticate(username=request.POST['username'].lower(),
+                                 password=request.POST['password'])
+        if user is not None:
+            redirect_page = "/users/{}".format(request.POST['username'].lower())
+            auth.login(request, user)
+            LOGGER.info("USER LOGIN     :: User %s is connected from %s",
+                        request.user, request.META.get('REMOTE_ADDR'))
+            return HttpResponseRedirect(redirect_page)
+        info['info'] = 'Your login/password are wrong'
+        LOGGER.info("LOGIN FAILED   :: Attempt to login with user '%s' from %s",
+                    request.POST['username'], request.META.get('REMOTE_ADDR'))
+        return render(request, "login.html", context=info)
+    return render(request, "login.html")
 
 
 @login_required()
 def logout(request):
     """
     Logout user and redirect to login page
-
     :param request: HTTP request
     :return: HTTP
     """
-    LOGGER.info("USER LOGOUT    :: User %s is disconnected from %s ", request.user, request.META.get('REMOTE_ADDR'))
+    LOGGER.info("USER LOGOUT    :: User %s is disconnected from %s ",
+                request.user, request.META.get('REMOTE_ADDR'))
     auth.logout(request)
     return redirect('/')
 
@@ -476,9 +482,9 @@ def logout(request):
 @login_required()
 def user_dispatcher(request):
     """
-
-    :param request:
-    :return:
+    make desc.
+    :param request: Web request
+    :return: void
     """
     uri = request.path
     url_user = "/users/{}".format(request.user)
@@ -486,27 +492,28 @@ def user_dispatcher(request):
     if uri != url_user\
             and 'dn' not in request.GET:
         return HttpResponseRedirect(url_user)
-    else:
-        if request.method == 'GET'\
-                and 'format' in request.GET\
-                and request.GET['format'] == 'json':
-            return user_get_json(request)
-        elif request.method == 'GET':
-            return render(request, 'user_get_html.html')
+    if request.method == 'GET'\
+            and 'format' in request.GET\
+            and request.GET['format'] == 'json':
+        return user_get_json(request)
+    elif request.method == 'GET':
+        return render(request, 'user_get_html.html')
 
 
 @login_required()
 def groups_dispatcher(request):
     """
-
-    :param request:
-    :return:
+    make desc.
+    :param request: Web request
+    :return: void
     """
     if (user_is_admin(request, spec='python')['admin'] != 'False'
             or (user_is_group_admin(request, type='python')['admin'] != 'False'
-                and (request.path_info.split('/')[2] in user_is_group_admin(request, type='python')['admin']
-                    or (len(request.META['HTTP_REFERER'].split('/')) == 5
-                        and request.META['HTTP_REFERER'].split('/')[4] in user_is_group_admin(request, type='python')['admin'])))):
+                and (request.path_info.split('/')[2]
+                     in user_is_group_admin(request, type='python')['admin']
+                     or (len(request.META['HTTP_REFERER'].split('/')) == 5
+                         and request.META['HTTP_REFERER'].split('/')[4]
+                         in user_is_group_admin(request, type='python')['admin'])))):
         if request.method == 'PUT':
             data = QueryDict(request.body).dict()
             user = data['user']
@@ -517,15 +524,12 @@ def groups_dispatcher(request):
                 and 'format' in request.GET\
                 and request.GET['format'] == 'json':
             return groups_get_json(request, spec='all')
-        else:
-            return groups_get_html(request)
+        return groups_get_html(request)
 
     elif request.method == 'GET'\
             and 'format' in request.GET\
             and request.GET['format'] == 'json'\
             and user_is_group_admin(request, type='python')['admin'] != 'False':
-            # and request.path in user_is_group_admin(request, type='python')['admin']:
-
         return groups_get_json(request)
     elif request.method == 'GET'\
             and user_is_group_admin(request, type='python')['admin'] != 'False':
@@ -535,7 +539,7 @@ def groups_dispatcher(request):
 
 
 @login_required()
-def group_dispatcher(request):
+def group_dispatcher(request):  # pylint: disable=too-many-return-statements
     """
 
     :param request:
@@ -547,45 +551,48 @@ def group_dispatcher(request):
             and request.GET['format'] == 'json'\
             and request.GET['email'] == 'bar'\
             and ((user_is_group_admin(request, type='python')['admin'] != 'False'
-                and request.path_info.split('/')[2] in user_is_group_admin(request, type='python')['admin'])
-                or user_is_admin(request, spec='python')['admin'] != 'False'):
+                  and request.path_info.split('/')[2]
+                  in user_is_group_admin(request, type='python')['admin'])
+                 or user_is_admin(request, spec='python')['admin'] != 'False'):  # pylint: disable=too-many-boolean-expressions
         return user_get_json(request)
-
     elif request.method == 'GET'\
             and 'format' in request.GET\
             and request.GET['format'] == 'json'\
             and ((user_is_group_admin(request, type='python')['admin'] != 'False'
-            and request.path_info.split('/')[2] in user_is_group_admin(request, type='python')['admin'])
-                or user_is_admin(request, spec='python')['admin'] != 'False'):
+                  and request.path_info.split('/')[2]
+                  in user_is_group_admin(request, type='python')['admin'])
+                 or user_is_admin(request, spec='python')['admin'] != 'False'):  # pylint: disable=too-many-boolean-expressions
         return group_get_json(request)
 
     elif request.method == 'GET'\
             and ((user_is_group_admin(request, type='python')['admin'] != 'False'
-            and request.path_info.split('/')[2] in user_is_group_admin(request, type='python')['admin'])
-                or user_is_admin(request, spec='python')['admin'] != 'False'):
+                  and request.path_info.split('/')[2]
+                  in user_is_group_admin(request, type='python')['admin'])
+                 or user_is_admin(request, spec='python')['admin'] != 'False'):
         return group_get_html(request)
 
     elif request.method == 'GET'\
             and 'admin' in request.GET\
             and ((user_is_group_admin(request, type='python')['admin'] != 'False'
-            and request.path_info.split('/')[2] in user_is_group_admin(request, type='python')['admin'])
-                or user_is_admin(request, spec='python')['admin'] != 'False'):
+                  and request.path_info.split('/')[2]
+                  in user_is_group_admin(request, type='python')['admin'])
+                 or user_is_admin(request, spec='python')['admin'] != 'False'):
         return group_get_json(request)
 
     elif request.method == 'DEL'\
             and ((user_is_group_admin(request, type='python')['admin'] != 'False'
-            and request.path_info.split('/')[2] in user_is_group_admin(request, type='python')['admin'])
-                or user_is_admin(request, spec='python')['admin'] != 'False'):
+                  and request.path_info.split('/')[2]
+                  in user_is_group_admin(request, type='python')['admin'])
+                 or user_is_admin(request, spec='python')['admin'] != 'False'):
         return group_del_json(request)
 
     elif request.method == 'PUT'\
         and ((user_is_group_admin(request, type='python')['admin'] != 'False'
-        and request.path_info.split('/')[2] in user_is_group_admin(request, type='python')['admin'])
-            or user_is_admin(request, spec='python')['admin'] != 'False'):
+              and request.path_info.split('/')[2]
+              in user_is_group_admin(request, type='python')['admin'])
+             or user_is_admin(request, spec='python')['admin'] != 'False'):
         return group_put_json(request)
-
-    else:
-        return redirect('/')
+    return redirect('/')
 
 
 @login_required()
@@ -596,7 +603,7 @@ def group_put_json(request):
     :return:
     """
     status = "False"
-    ldap = OpenLdap(GLOBAL_CONFIG)
+    ldap = OpenLdap()
     data = QueryDict(request.body).dict()
     user = data['user']
     group = request.path_info.split('/')[2]
@@ -612,10 +619,11 @@ def group_put_json(request):
                 update_count_force(request.user, 'add')
             else:
                 status = "False"
-            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s, action=member added", request.user, group, user)
+            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s,"
+                        " action=member added", request.user, group, user)
         else:
             status = "already"
-    except:
+    except:  # pylint: disable=bare-except
         status = "not exist"
 
     data['status'] = status
@@ -629,7 +637,7 @@ def group_del_json(request):
     :param request:
     :return:
     """
-    ldap = OpenLdap(GLOBAL_CONFIG)
+    ldap = OpenLdap()
     data = QueryDict(request.body).dict()
     user = data['user']
 
@@ -648,9 +656,10 @@ def group_del_json(request):
                 update_count_force(request.user, 'remove')
             try:
                 del_entry_is_admin(user, group)
-            except:
+            except:  # pylint: disable=bare-except
                 pass
-            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s, action=member deleted", request.user, group, user)
+            LOGGER.info("GROUP MODIFIED :: Operator : %s  :: Attributes : group=%s, user=%s, "
+                        "action=member deleted", request.user, group, user)
         else:
             status = "False"
         data['status'] = status
@@ -665,12 +674,12 @@ def group_get_json(request):
     :return:
     """
     data = {}
-    ldap = OpenLdap(GLOBAL_CONFIG)
+    ldap = OpenLdap()
     user_list = []
 
     if 'admin' in request.GET:
         location = request.path_info.split('/')[2]
-        user_admin = IsAdmin.objects.filter(group__group_name=location)
+        user_admin = IsAdmin.objects.filter(group__group_name=location)  # pylint: disable=no-member
         if user_admin:
             for each in user_admin:
                 user_list.append(str(each.administrators))
@@ -680,11 +689,11 @@ def group_get_json(request):
         attrs = ldap.search_group(request.path_info.split('/')[2])
         data['attrs'] = {}
 
-        for key, value in attrs:
+        for key, value in attrs:  # pylint: disable=unused-variable
             for each in value:
                 data['attrs'][each] = value[each]
 
-        if data['attrs']['uniqueMember'] is not '':
+        if data['attrs']['uniqueMember'] is not '':  # pylint: disable=literal-comparison
             members = user_get_json(request, spec=data['attrs']['uniqueMember'])
             data['members'] = members['members']
             data['admin'] = members['admin']
@@ -712,20 +721,19 @@ def user_get_html(request):
 
 
 @login_required()
-def user_get_json(request,
-                  spec=None):
+def user_get_json(request, spec=None):  #pylint: disable=too-many-branches, too-many-locals
     """
 
     :param request:
     :return:
     """
-    data = {}
-    ldap = OpenLdap(GLOBAL_CONFIG)
-    data['attrs'] = {}
-    data['users'] = {}
+    data = dict()
+    ldap = OpenLdap()
+    data['attrs'] = dict()
+    data['users'] = dict()
     members = []
     final_list = []
-    final_dict = {}
+    final_dict = dict()
     admin_list = []
 
     if spec is not None:
@@ -742,7 +750,7 @@ def user_get_json(request,
             final_list.append(tmp)
 
         location = request.path_info.split('/')[2]
-        user_admin = IsAdmin.objects.filter(group__group_name=location)
+        user_admin = IsAdmin.objects.filter(group__group_name=location)  # pylint: disable=no-member
         if user_admin:
             for each in user_admin:
                 admin_list.append(str(each.administrators))
@@ -762,7 +770,6 @@ def user_get_json(request,
 
     else:
         attrs = ldap.search_user(attributes=request.user)
-
         for key, value in attrs:
             for each in value:
                 data['attrs'][each] = value[each]
@@ -771,9 +778,9 @@ def user_get_json(request,
 
 def home_get_html(request):
     """
-
-    :param request:
-    :return:
+    make desc.
+    :param request: Web request
+    :return: void
     """
     return render(request, 'home_get_html.html')
 
@@ -781,31 +788,29 @@ def home_get_html(request):
 @login_required()
 def groups_get_html(request):
     """
-
-    :param request:
-    :return:
+    make desc.
+    :param request: Web request
+    :return: void
     """
     data = user_is_group_admin(request, type='python')
     if data['status'] != 'True':
         return redirect('/')
-    else:
-        return render(request, 'groups_get_html.html')
+    return render(request, 'groups_get_html.html')
 
 
 @login_required()
-def groups_get_json(request,
-                    spec=None):
+def groups_get_json(request, spec=None):
     """
-
-    :param request:
-    :param spec:
-    :return:
+    make desc.
+    :param request: Web request
+    :param spec: Spec.
+    :return: void
     """
-    data = {}
+    data = dict()
     groups = []
 
     if spec is not None:
-        ldap = OpenLdap(GLOBAL_CONFIG)
+        ldap = OpenLdap()
         groups_value = ldap.search_groups()
         for each in groups_value:
             groups.append(each[1]['cn'][0])
@@ -819,15 +824,20 @@ def groups_get_json(request,
 
 def policies_get_html(request):
     """
-
-    :param request:
-    :return:
+    make desc.
+    :param request: Web request
+    :return: void
     """
     return render(request, 'policies_get_html.html')
 
 
 def register_dispatcher(request):
-    attributes = {}
+    """
+    make desc.
+    :param request: Web request
+    :return: void
+    """
+    attributes = dict()
     if 'format' in request.GET:
         if 'adduser' in request.GET:
             attributes = QueryDict(request.body).dict()
@@ -841,7 +851,12 @@ def register_dispatcher(request):
         return render(request, 'register_get_html.html')
 
 
-def attributes_dispatcher(request):
+def attributes_dispatcher(request):  # pylint: disable=too-many-statements, too-many-branches, too-many-return-statements
+    """
+    make desc.
+    :param request: Web request
+    :return: void
+    """
     attributes = {}
     if 'password' in request.GET:
         password = request.GET['password']
@@ -849,12 +864,11 @@ def attributes_dispatcher(request):
         return JsonResponse(attributes)
 
     if 'checkPassword' in request.GET:
-        ldap = OpenLdap(GLOBAL_CONFIG)
+        ldap = OpenLdap()
         password = unicode(request.GET['checkPassword']).encode(encoding='utf-8')
         uid = str(request.user)
-        userPassword = ldap.search_user(password=uid)
-
-        userPassword = userPassword[0][1]['userPassword'][0]
+        userPassword = ldap.search_user(password=uid)  # pylint: disable=invalid-name
+        userPassword = userPassword[0][1]['userPassword'][0]  # pylint: disable=invalid-name
         checked = check_password(userPassword, password)
 
         if checked:
@@ -864,9 +878,9 @@ def attributes_dispatcher(request):
         return JsonResponse(attributes)
 
     if 'changePassword' in request.GET:
-        info = {}
+        info = dict()
         attributes = QueryDict(request.body).dict()
-        ldap = OpenLdap(GLOBAL_CONFIG)
+        ldap = OpenLdap()
         uid = str(request.user)
         password = encode_password(unicode(attributes['changePassword'])
                                    .encode(encoding='utf-8'))
@@ -874,12 +888,9 @@ def attributes_dispatcher(request):
             attrs = ldap.change_user_password(uid, password)
             LOGGER.info("USER MODIFIED  :: username=%s, action=password changed", request.user)
             return JsonResponse(attrs)
-        except:
+        except:  # pylint: disable=bare-except
             info['info'] = 'Fail to change your password.'
             return render(request, 'error_get_html.html', context=info)
-        # return render(request, 'home_get_html.html')
-
-    ### TEST ###
     elif 'passwords' in request.GET:
         password = request.GET['passwords']
         attributes['password'] = encode_password(password)
@@ -887,12 +898,10 @@ def attributes_dispatcher(request):
         print password
         print type(attributes['password'])
         print attributes['password']
-        # return JsonResponse(attributes)
         return render(request, 'users_get_html.html')
-    ### END ###
 
     elif 'uid' in request.GET:
-        ldap = OpenLdap(GLOBAL_CONFIG)
+        ldap = OpenLdap()
         uid = normalize_string(request.GET['uid'])
         checked = ldap.search_user(uid=uid)
         attributes['uid'] = uid
@@ -911,7 +920,7 @@ def attributes_dispatcher(request):
         return JsonResponse(attributes)
 
     elif 'mail' in request.GET:
-        ldap = OpenLdap(GLOBAL_CONFIG)
+        ldap = OpenLdap()
         mail = request.GET['mail']
         checked = ldap.search_user(mail=mail)
 
@@ -927,10 +936,15 @@ def attributes_dispatcher(request):
         return JsonResponse(attributes)
 
 
-def add_user(request,
-             attributes):
+def add_user(request, attributes):
+    """
+    make desc.
+    :param request: Web request
+    :param attributes: attributes
+    :return: void
+    """
     GLOBAL_CONFIG['project'] = ''
-    ldap = OpenLdap(GLOBAL_CONFIG)
+    ldap = OpenLdap()
     username = str(attributes['username'])
     email = str(attributes['email'])
     firstname = str(attributes['firstname'])
@@ -941,26 +955,31 @@ def add_user(request,
 
     try:
         ldap.add_user(username, email, firstname, lastname, x500dn, password)
-        LOGGER.info("USER CREATED   :: Operator : %s  :: Attributes : username=%s, firstname=%s, lastname=%s, email=%s ", request.user, username, firstname, lastname, email)
+        LOGGER.info("USER CREATED   :: Operator : %s  :: Attributes : username=%s, firstname=%s,"
+                    " lastname=%s, email=%s ", request.user, username, firstname, lastname, email)
     except InvalidX500DN:
         exit(1)
     send_mail(username, firstname, lastname, email, '', '', 'add')
 
 
 def activate_user(request):
-    uuid = request.path.split('/action/')
+    """
+    make desC.
+    :param request: Web request
+    :return: void
+    """
+    uuid = request.path.split('/action/')  # pylint: disable=redefined-outer-name
     uuid.pop(0)
     uuid = str(uuid[0])
-    ldap = OpenLdap(GLOBAL_CONFIG)
-    info = {}
+    ldap = OpenLdap()
+    info = dict()
     try:
         attrs = ldap.enable_user(uuid)
         send_mail(attrs['username'], attrs['firstname'], attrs['lastname'],
                   attrs['mail'], GLOBAL_CONFIG['project'],
-                  # 'marchal@lal.in2p3.fr', 'enable')
                   GLOBAL_CONFIG['admin'], 'enable')
         LOGGER.info("USER MODIFIED  :: user=%s, action=activated", attrs['username'])
-    except:
+    except:  # pylint: disable=bare-except
         info['info'] = 'Your account is already enable or the url is not ' \
                           'valid, please check your mailbox.'
         return render(request, 'error_get_html.html', context=info)

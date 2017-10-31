@@ -1,10 +1,14 @@
+"""
+This module is used to provide some usefull function to openstack_registration project
+"""
 import logging
 from logging.handlers import RotatingFileHandler
 
 from openstack_registration.config import GLOBAL_CONFIG
 
+
 def create_logger(mode,
-                  stream_level=logging.INFO,
+                  stream_level=logging.INFO,  # pylint: disable=unused-argument
                   file_level=logging.DEBUG):
     """
     Create a logger according to the given level
@@ -32,20 +36,12 @@ def create_logger(mode,
         file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
-
-    # rsyslog
-    # handler.formatter = formatter
-    # logger.addHandler(handler)
-    #
-    # stream_handler = logging.StreamHandler()
-    # stream_handler.setLevel(stream_level)
-    # logger.addHandler(stream_handler)
-
     return logger
 
+
 def create_logger_error(mode,
-                  stream_level=logging.INFO,
-                  file_level=logging.DEBUG):
+                        stream_level=logging.INFO,  # pylint: disable=unused-argument
+                        file_level=logging.DEBUG):
     """
     Create a logger according to the given level
     :param mode:
@@ -72,13 +68,5 @@ def create_logger_error(mode,
         file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
         logger_error.addHandler(file_handler)
-
-    # rsyslog
-    # handler.formatter = formatter
-    # logger.addHandler(handler)
-    #
-    # stream_handler = logging.StreamHandler()
-    # stream_handler.setLevel(stream_level)
-    # logger.addHandler(stream_handler)
 
     return logger_error

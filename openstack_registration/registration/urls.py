@@ -14,11 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.contrib import admin
-from registration import views
 from django.views.generic.base import RedirectView
 
-urlpatterns = [
+from registration import views
+
+urlpatterns = [  # pylint: disable=invalid-name
     url(r'^admin/$', views.admin_dispatcher),
     url(r'^admin/users', views.admin_users_dispatcher),
     url(r'^$', views.home_get_html),

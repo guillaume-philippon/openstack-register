@@ -13,16 +13,16 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
-import ldap
-from utils import create_logger, create_logger_error
 import logging
+import ldap
 
 from django_auth_ldap.config import LDAPSearch
 
+from openstack_registration.utils import create_logger, create_logger_error
 from openstack_registration.config import GLOBAL_CONFIG, load_config
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # We load configuration file
@@ -138,29 +138,15 @@ LOGIN_REDIRECT_URL = '/'
 STATIC_URL = '/static/'
 # MEDIA_URL = 'js/'
 
-logging_mode = 'both'
-logger = create_logger(logging_mode, stream_level=logging.DEBUG)
-logger_error = create_logger_error(logging_mode, stream_level=logging.DEBUG)
-
-# GLOBAL_CONFIG['LOGGER'] = logger
-
-# config = ConfigParser.RawConfigParser()
-# config.read('/etc/register.cfg')
-#
-# GLOBAL_CONFIG['LDAP_SERVER'] = config.get('LDAP', 'server')
-# GLOBAL_CONFIG['LDAP_USER'] = config.get('LDAP', 'bind_dn')
-# GLOBAL_CONFIG['LDAP_PASSWORD'] = config.get('LDAP', 'password')
-# GLOBAL_CONFIG['LDAP_BASE_OU'] = config.get('LDAP', 'user_search')
-# GLOBAL_CONFIG['project'] = ''
-# GLOBAL_CONFIG['admin'] = config.get('MAILING', 'admin')
-# GLOBAL_CONFIG['DEBUG_LVL'] = config.get('MAIN', 'debug_lvl')
-
+LOGGING_MODE = 'both'
+LOGGER = create_logger(LOGGING_MODE, stream_level=logging.DEBUG)
+LOGGER_ERROR = create_logger_error(LOGGING_MODE, stream_level=logging.DEBUG)
 
 AUTH_LDAP_SERVER_URI = GLOBAL_CONFIG['LDAP_SERVER']
 AUTH_LDAP_BIND_DN = GLOBAL_CONFIG['LDAP_USER']
 AUTH_LDAP_BIND_PASSWORD = GLOBAL_CONFIG['LDAP_PASSWORD']
 AUTH_LDAP_USER_SEARCH = LDAPSearch(GLOBAL_CONFIG['LDAP_BASE_OU'],
-                                   ldap.SCOPE_SUBTREE,
+                                   ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
                                    "(uid=%(user)s)")
 
 AUTHENTICATION_BACKENDS = (

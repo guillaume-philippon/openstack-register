@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+# pylint: skip-file
 # -*- coding: utf-8 -*-
 
 from OpenLdap import *

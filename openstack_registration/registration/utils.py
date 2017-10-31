@@ -1,4 +1,6 @@
-#!/usr/local/bin/python2.7
+"""
+Some usefull function of registration module
+"""
 # -*- coding: utf-8 -*-
 
 import os
@@ -6,63 +8,16 @@ import hashlib
 import unicodedata
 import re
 import logging
-from logging.handlers import RotatingFileHandler
-# from base64 import urlsafe_b64encode as encode
-# from base64 import urlsafe_b64decode as decode
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import uuid
-from models import UserActivation, UserInfo, GroupInfo, IsAdmin
 from datetime import datetime
+
+from registration.models import UserActivation, UserInfo, GroupInfo, IsAdmin
 
 LOGGER = logging.getLogger("registration")
 
-# def create_logger(mode,
-#                   stream_level=logging.INFO,
-#                   file_level=logging.DEBUG):
-#     """
-#     Create a logger according to the given level
-#     :param mode:
-#     :param stream_level:
-#     :param file_level:
-#     :return:
-#     """
-#     logger = logging.getLogger("registration")
-#     logger.setLevel(logging.DEBUG)
-#
-#     # Use rsyslog to send logs to others
-#     # handler = logging.handlers.SysLogHandler(address="/dev/log")
-#     formatter = logging.Formatter(
-#         '%(asctime)s :: %(levelname)s :: %(message)s'
-#     )
-#
-#     if mode == 'both':
-#         # Fichier en mode 'append', avec 1 backup et une taille max de 1Mo
-#         file_handler = RotatingFileHandler('/var/log/registration/registration.log',
-#                                            'a',
-#                                            1000000,
-#                                            1)
-#
-#         file_handler.setLevel(file_level)
-#         file_handler.setFormatter(formatter)
-#         logger.addHandler(file_handler)
-#
-#     # rsyslog
-#     # handler.formatter = formatter
-#     # logger.addHandler(handler)
-#     #
-#     # stream_handler = logging.StreamHandler()
-#     # stream_handler.setLevel(stream_level)
-#     # logger.addHandler(stream_handler)
-#
-#     return logger
-
-# def encode_password(password):
-#     salt = os.urandom(4)
-#     h = hashlib.sha1(password)
-#     h.update(salt)
-#     return '{SSHA}' + encode(h.digest() + salt)
 
 def encode_password(password):
     """
@@ -108,16 +63,7 @@ def check_password(tagged_digest_salt, password):
     return digest == sha.digest()
 
 
-# def check_password(challenge_password, password):
-#     challenge_bytes = decode(challenge_password[6:])
-#     digest = challenge_bytes[:20]
-#     salt = challenge_bytes[20:]
-#     hr = hashlib.sha1(password)
-#     hr.update(salt)
-#     return digest == hr.digest()
-
-
-def check_password_constraints(password):
+def check_password_constraints(password):  # pylint: disable: too-many-branches
     """
 
     :param password:
@@ -167,8 +113,7 @@ def check_password_constraints(password):
     return attributes
 
 
-def normalize_string(string,
-                     option=None):
+def normalize_string(string, option=None):
     """
 
     :param string:
@@ -186,13 +131,7 @@ def normalize_string(string,
                              .encode('ASCII', 'ignore').lower()))
 
 
-def send_mail(username,
-              firstname,
-              lastname,
-              user_email,
-              project,
-              admin_mail,
-              action):
+def send_mail(username, firstname, lastname, user_email, project, admin_mail, action):  # pylint: disable: too-many-branches
     """
 
     :param username:
@@ -247,66 +186,97 @@ def send_mail(username,
 
     header.attach(MIMEText(message))
     mail_server = smtplib.SMTP('smtp.lal.in2p3.fr', 25)
-    # replace marchal@ by all_rcpt
-    # mail_server.sendmail('no-reply@lal.in2p3.fr', 'marchal@lal.in2p3.fr',
-    mail_server.sendmail('no-reply@lal.in2p3.fr', all_rcpt,
-                         header.as_string())
+    mail_server.sendmail('no-reply@lal.in2p3.fr', all_rcpt, header.as_string())
 
     mail_server.quit()
 
 
-def add_entry_user_activation(random_string,
-                              user):
+def add_entry_user_activation(random_string, user):
+    """
 
+    :param random_string:
+    :param user:
+    :return:
+    """
     new_user = UserActivation(link=random_string, username=user)
     new_user.save()
 
 
-def add_entry_user_info(user,
-                        date):
+def add_entry_user_info(user, date):
+    """
+
+    :param user:
+    :param date:
+    :return:
+    """
     new_user = UserInfo(username=user, last_agreement=date, enabled=True)
     new_user.save()
 
 
 def add_entry_group_info(group):
+    """
+
+    :param group:
+    :return:
+    """
     new_group = GroupInfo(group_name=group)
     new_group.save()
 
 
-def add_entry_is_admin(user,
-                      group):
-    user_id = UserInfo.objects.filter(username=user)[0].id
-    exist_user = UserInfo.objects.get(id=user_id)
-    group_id = GroupInfo.objects.filter(group_name=group)[0].id
-    exist_group = GroupInfo.objects.get(id=group_id)
+def add_entry_is_admin(user, group):
+    """
+
+    :param user:
+    :param group:
+    :return:
+    """
+    user_id = UserInfo.objects.filter(username=user)[0].id  # pylint: disable=no-member
+    exist_user = UserInfo.objects.get(id=user_id)  # pylint: disable=no-member
+    group_id = GroupInfo.objects.filter(group_name=group)[0].id  # pylint: disable=no-member
+    exist_group = GroupInfo.objects.get(id=group_id)  # pylint: disable=no-member
     new_admin = IsAdmin(administrators=exist_user, group=exist_group)
     new_admin.save()
 
 
-def del_entry_is_admin(user,
-                       group):
-    user_id = UserInfo.objects.filter(username=user)[0].id
-    exist_user = UserInfo.objects.get(id=user_id)
-    group_id = GroupInfo.objects.filter(group_name=group)[0].id
-    exist_group = GroupInfo.objects.get(id=group_id)
-    admin = IsAdmin.objects.filter(administrators=exist_user, group=exist_group)
+def del_entry_is_admin(user, group):
+    """
+
+    :param user:
+    :param group:
+    :return:
+    """
+    user_id = UserInfo.objects.filter(username=user)[0].id  # pylint: disable=no-member
+    exist_user = UserInfo.objects.get(id=user_id)  # pylint: disable=no-member
+    group_id = GroupInfo.objects.filter(group_name=group)[0].id  # pylint: disable=no-member
+    exist_group = GroupInfo.objects.get(id=group_id)  # pylint: disable=no-member
+    admin = IsAdmin.objects.filter(administrators=exist_user, group=exist_group)  # pylint: disable=no-member
     admin.delete()
 
 
-def update_entry_user_info(user,
-                           value):
-    data = {}
+def update_entry_user_info(user, value):
+    """
+
+    :param user:
+    :param value:
+    :return:
+    """
+    data = dict()
     try:
         existing_user = UserInfo.objects.filter(username=user)
-        # existing_user[0].admin = value
         existing_user.update(admin=value)
         data['status'] = 'True'
-    except:
+    except:  # pylint: disable=bare-except
         data['status'] = 'False'
     return data
 
-def update_count_force(user,
-                       action):
+
+def update_count_force(user, action):
+    """
+
+    :param user:
+    :param action:
+    :return:
+    """
     try:
         existing_user = UserInfo.objects.filter(username=user)
         if action == 'add':
@@ -314,5 +284,5 @@ def update_count_force(user,
         else:
             value = existing_user[0].countForce - 1
         existing_user.update(countForce=value)
-    except:
+    except:  # pylint: disable=bare-except
         pass
