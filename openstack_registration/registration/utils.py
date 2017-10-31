@@ -63,7 +63,7 @@ def check_password(tagged_digest_salt, password):
     return digest == sha.digest()
 
 
-def check_password_constraints(password):  # pylint: disable: too-many-branches
+def check_password_constraints(password):  # pylint: disable=too-many-branches
     """
 
     :param password:
@@ -131,7 +131,7 @@ def normalize_string(string, option=None):
                              .encode('ASCII', 'ignore').lower()))
 
 
-def send_mail(username, firstname, lastname, user_email, project, admin_mail, action):  # pylint: disable: too-many-branches
+def send_mail(username, firstname, lastname, user_email, project, admin_mail, action):  # pylint: disable=too-many-branches, too-many-arguments
     """
 
     :param username:

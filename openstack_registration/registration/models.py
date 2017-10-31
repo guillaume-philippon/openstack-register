@@ -3,10 +3,10 @@ Model to add admin support
 """
 from __future__ import unicode_literals
 
-from django.db import models
+from django.db import models  # pylint: disable=import-error
 
 
-class UserActivation(models.Model):
+class UserActivation(models.Model):  # pylint: disable=too-few-public-methods
     """
     UserActivation model
     """
@@ -15,9 +15,9 @@ class UserActivation(models.Model):
     expiration_date = models.DateField(auto_now_add=True, auto_now=False)
 
 
-class UserInfo(models.Model):
+class UserInfo(models.Model):  # pylint: disable=too-few-public-methods
     """
-
+    make desc.
     """
     username = models.CharField(max_length=32, null=False)
     creation_date = models.DateField(auto_now_add=True, auto_now=False)
@@ -29,9 +29,9 @@ class UserInfo(models.Model):
         return self.username
 
 
-class GroupInfo(models.Model):
+class GroupInfo(models.Model):  # pylint: disable=too-few-public-methods
     """
-
+    make desc.
     """
     group_name = models.CharField(max_length=32, null=False)
     administrators = models.ManyToManyField(UserInfo, through='IsAdmin')
@@ -40,9 +40,9 @@ class GroupInfo(models.Model):
         return self.group_name
 
 
-class IsAdmin(models.Model):
+class IsAdmin(models.Model):  # pylint: disable=too-few-public-methods
     """
-
+    make desc.
     """
     administrators = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     group = models.ForeignKey(GroupInfo, on_delete=models.CASCADE)
