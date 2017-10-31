@@ -1,6 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
+from openstack_registration.config import GLOBAL_CONFIG
 
 def create_logger(mode,
                   stream_level=logging.INFO,
@@ -23,7 +24,7 @@ def create_logger(mode,
 
     if mode == 'both':
         # Fichier en mode 'append', avec 1 backup et une taille max de 1Mo
-        file_handler = RotatingFileHandler('/var/log/registration/registration.log',
+        file_handler = RotatingFileHandler(GLOBAL_CONFIG['LOG_DIR'] + '/registration.log',
                                            'a',
                                            1000000,
                                            1)
@@ -63,7 +64,7 @@ def create_logger_error(mode,
 
     if mode == 'both':
         # Fichier en mode 'append', avec 1 backup et une taille max de 1Mo
-        file_handler = RotatingFileHandler('/var/log/registration/registration.log',
+        file_handler = RotatingFileHandler(GLOBAL_CONFIG['LOG_DIR'] + '/registration.log',
                                            'a',
                                            1000000,
                                            1)

@@ -16,20 +16,23 @@ import os
 import ldap
 from utils import create_logger, create_logger_error
 import logging
-import ConfigParser
+
 from django_auth_ldap.config import LDAPSearch
 
+from openstack_registration.config import GLOBAL_CONFIG, load_config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# We load configuration file
+load_config()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '4k8(2g_d_05t7^^g*8&@2k3qghe7eh2ws)mfl-*^d@5=jd*3_^'
+SECRET_KEY = 'This_Should_be_change'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -134,32 +137,32 @@ LOGOUT_URL = '/logout:'
 LOGIN_REDIRECT_URL = '/'
 STATIC_URL = '/static/'
 # MEDIA_URL = 'js/'
-GLOBAL_CONFIG = {}
+
 logging_mode = 'both'
 logger = create_logger(logging_mode, stream_level=logging.DEBUG)
 logger_error = create_logger_error(logging_mode, stream_level=logging.DEBUG)
 
 # GLOBAL_CONFIG['LOGGER'] = logger
 
-config = ConfigParser.RawConfigParser()
-config.read('/etc/register.cfg')
+# config = ConfigParser.RawConfigParser()
+# config.read('/etc/register.cfg')
+#
+# GLOBAL_CONFIG['LDAP_SERVER'] = config.get('LDAP', 'server')
+# GLOBAL_CONFIG['LDAP_USER'] = config.get('LDAP', 'bind_dn')
+# GLOBAL_CONFIG['LDAP_PASSWORD'] = config.get('LDAP', 'password')
+# GLOBAL_CONFIG['LDAP_BASE_OU'] = config.get('LDAP', 'user_search')
+# GLOBAL_CONFIG['project'] = ''
+# GLOBAL_CONFIG['admin'] = config.get('MAILING', 'admin')
+# GLOBAL_CONFIG['DEBUG_LVL'] = config.get('MAIN', 'debug_lvl')
 
-GLOBAL_CONFIG['LDAP_SERVER'] = config.get('LDAP', 'server')
-GLOBAL_CONFIG['LDAP_USER'] = config.get('LDAP', 'bind_dn')
-GLOBAL_CONFIG['LDAP_PASSWORD'] = config.get('LDAP', 'password')
-GLOBAL_CONFIG['LDAP_BASE_OU'] = config.get('LDAP', 'user_search')
-GLOBAL_CONFIG['project'] = ''
-GLOBAL_CONFIG['admin'] = config.get('MAILING', 'admin')
-GLOBAL_CONFIG['DEBUG_LVL'] = config.get('MAIN', 'debug_lvl')
 
-
-AUTH_LDAP_SERVER_URI = config.get('AUTH', 'server')
-AUTH_LDAP_BIND_DN = config.get('AUTH', 'bind_dn')
-AUTH_LDAP_BIND_PASSWORD = config.get('AUTH', 'password')
-AUTH_LDAP_USER_SEARCH = LDAPSearch(config.get('AUTH',
-                                              'user_search'),
+AUTH_LDAP_SERVER_URI = GLOBAL_CONFIG['LDAP_SERVER']
+AUTH_LDAP_BIND_DN = GLOBAL_CONFIG['LDAP_USER']
+AUTH_LDAP_BIND_PASSWORD = GLOBAL_CONFIG['LDAP_PASSWORD']
+AUTH_LDAP_USER_SEARCH = LDAPSearch(GLOBAL_CONFIG['LDAP_BASE_OU'],
                                    ldap.SCOPE_SUBTREE,
                                    "(uid=%(user)s)")
+
 AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',

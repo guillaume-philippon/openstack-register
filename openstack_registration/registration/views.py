@@ -98,7 +98,7 @@ def logs_dispatcher(request):
 def logs_get_json(request):
     # pass
     data = {}
-    log_file = open("/var/log/registration/registration.log", "r")
+    log_file = open(GLOBAL_CONFIG['LOG_DIR'] + "/registration.log", "r")
     lines = log_file.readlines()
     log_file.close()
     version = request.GET['version']
