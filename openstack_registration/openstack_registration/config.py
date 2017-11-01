@@ -22,7 +22,11 @@ GLOBAL_CONFIG = {
 
     # [main]
     'DEBUG_LVL': '1',
-    'LOG_DIR': '/var/log/openstack-registration/'
+    'LOG_DIR': '/var/log/openstack-registration/',
+    'REGISTRATION_URL': 'http://127.0.0.1',
+
+    # [mailing]
+    'MAIL_FROM': 'no-reply@example.com'
 }
 
 # Options for [auth] section
@@ -36,12 +40,15 @@ AUTH_OPTIONS = {
 # Options for [main] section
 MAIN_OPTIONS = {
     'DEBUG_LVL': 'debug_lvl',
-    'LOG_DIR': 'logdir'
+    'LOG_DIR': 'logdir',
+    'REGISTRATION_URL': 'register_url'
 }
 
 # Options for [mailing]section
 MAILING_OPTIONS = {
-    'admin': 'admin'
+    'admin': 'admin',
+    'MAIL_FROM': 'from',
+    'MAIL_SERVER': 'server'
 }
 
 # List all sections and options associated

@@ -7,6 +7,8 @@ user_search = ou=users,o=cloud
 [main]
 debug_lvl = 1
 logdir = /var/log/openstack-registration
+register_url = https://registration.example.com
 
 [mailing]
 admin = openstack-admin@example.com
+from = no-reply@example.com

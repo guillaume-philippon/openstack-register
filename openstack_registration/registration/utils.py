@@ -16,6 +16,8 @@ from datetime import datetime
 
 from registration.models import UserActivation, UserInfo, GroupInfo, IsAdmin
 
+from openstack_registration.config import GLOBAL_CONFIG
+
 LOGGER = logging.getLogger("registration")
 
 
@@ -145,14 +147,14 @@ def send_mail(username, firstname, lastname, user_email, project, admin_mail, ac
     message = ''
     all_rcpt = ''
     header = MIMEMultipart()
-    header['From'] = 'no-reply@lal.in2p3.fr'
+    header['From'] = GLOBAL_CONFIG['MAIL_FROM']
     header['To'] = user_email
     header['Subject'] = 'OpenStack Registration Message'
 
     if action == 'add':
         all_rcpt = user_email
         random_string = uuid.uuid4()
-        link = "https://registration.lal.in2p3.fr/action/{}".format(random_string)
+        link = "{}/action/{}".format(GLOBAL_CONFIG['REGISTRATION_URL'], random_string)
         message = "Dear {} {}, \n\nYou just created an account on OpenStack@lal.\n" \
                   "Please follow the link to activate your account: \n{}\n\n" \
                   "You can have access to your profile on the registration " \
@@ -185,8 +187,8 @@ def send_mail(username, firstname, lastname, user_email, project, admin_mail, ac
         add_entry_user_info(username, datetime.now())
 
     header.attach(MIMEText(message))
-    mail_server = smtplib.SMTP('smtp.lal.in2p3.fr', 25)
-    mail_server.sendmail('no-reply@lal.in2p3.fr', all_rcpt, header.as_string())
+    mail_server = smtplib.SMTP(GLOBAL_CONFIG['MAIL_SERVER'], 25)
+    mail_server.sendmail(GLOBAL_CONFIG['MAIL_FROM'], all_rcpt, header.as_string())
 
     mail_server.quit()
 
