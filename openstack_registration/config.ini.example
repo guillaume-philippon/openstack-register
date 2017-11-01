@@ -1,0 +1,12 @@
+[auth]
+server = ldap://127.0.0.1
+bind_dn = cn=admin,o=cloud
+password = my_password
+user_search = ou=users,o=cloud
+
+[main]
+debug_lvl = 1
+logdir = /var/log/openstack-registration
+
+[mailing]
+admin = openstack-admin@example.com
