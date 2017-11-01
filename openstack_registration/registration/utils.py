@@ -262,7 +262,7 @@ def update_entry_user_info(user, value):
     """
     data = dict()
     try:
-        existing_user = UserInfo.objects.filter(username=user)
+        existing_user = UserInfo.objects.filter(username=user)  # pylint: disable=no-member
         existing_user.update(admin=value)
         data['status'] = 'True'
     except:  # pylint: disable=bare-except
@@ -278,7 +278,7 @@ def update_count_force(user, action):
     :return:
     """
     try:
-        existing_user = UserInfo.objects.filter(username=user)
+        existing_user = UserInfo.objects.filter(username=user)  # pylint: disable=no-member
         if action == 'add':
             value = existing_user[0].countForce + 1
         else:

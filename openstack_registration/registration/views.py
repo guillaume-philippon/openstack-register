@@ -61,7 +61,7 @@ def user_is_admin(request, spec=None):
     if spec == 'list':
         data['list'] = {}
         final_list = []
-        admin = UserInfo.objects.filter(admin=True)
+        admin = UserInfo.objects.filter(admin=True)  # pylint: disable=no-member
 
         for each in admin:
             tmp = {}
@@ -375,14 +375,14 @@ def user_is_group_admin(request, type=None):  # pylint: disable=redefined-builti
 
     if request.path_info.split('/')[1] == 'groupAdmin':
         location = request.path_info.split('/')[2]
-        user_admin = IsAdmin.objects.filter(group__group_name=location)
+        user_admin = IsAdmin.objects.filter(group__group_name=location)  # pylint: disable=no-member
 
     if user_is_admin(request, spec='python')['admin'] != 'False':
         data['status'] = 'True'
         data['admin'] = ['*']
 
     else:
-        is_admin = GroupInfo.objects.filter(administrators__username=request.user)
+        is_admin = GroupInfo.objects.filter(administrators__username=request.user)  # pylint: disable=no-member
         if is_admin:
             for each in is_admin:
                 group_list.append(str(each.group_name))
