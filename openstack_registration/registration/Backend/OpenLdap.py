@@ -270,3 +270,43 @@ class OpenLdap(PrototypeBackend):
         except:  # pylint: disable=bare-except
             attrs['status'] = 'fail'
         return attrs
+
+    def get(self, username='*'):
+        """
+        Return a list of users based on filter
+
+        :param username: username of user we want to get information
+        :return: list or dict
+        """
+        response = dict()
+        users = self.connection.search_s(self.base_ou, ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
+                                         "(&(objectClass=person)(uid={uid}))".format(uid=username),
+                                         ['uid', 'mail', 'givenName', 'sn', 'cn', 'pager'])
+        for _, attributes in users:
+            response[attributes['uid'][0]] = (self._ldap_to_dict(attributes))
+        return response
+
+    @staticmethod
+    def _ldap_to_dict(attributes):
+        """
+        return a list of users based on ldap output. By default ldap module return a list of value
+        even there is only one value for the attributes. To make it simple for other
+        openstack-registration module to interact with ldap, we format the output to be a dict of
+        value
+
+        :param attributes: ldap attributes to format
+        :return: dict
+        """
+        response = {
+            'uid': attributes['uid'][0],
+            'mail': attributes['mail'][0],
+            'firstname': attributes['givenName'][0],
+            'lastname': attributes['sn'][0],
+            'fullname': attributes['cn'][0]
+        }
+        # pager is a optional value, so we catch KeyError exception if we have it
+        try:
+            response['pager'] = attributes['pager'][0]
+        except KeyError:
+            pass
+        return response

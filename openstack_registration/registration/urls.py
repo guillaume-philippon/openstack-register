@@ -35,6 +35,6 @@ urlpatterns = [  # pylint: disable=invalid-name
     url(r'^isAdmin', views.user_is_admin),
     url(r'^groupAdmin/$', views.groups_dispatcher),
     url(r'^groupAdmin/[\w]+', views.group_dispatcher),
-    url(r'^users/[\w]+', views.user_dispatcher),
+    url(r'^users/(?P<username>[\w]+)$', views.user_dispatcher),
     url(r'^users/$', RedirectView.as_view(url='/users/connected', permanent=False))
 ]

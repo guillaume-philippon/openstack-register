@@ -1,5 +1,6 @@
 """
-Registration view
+View module manage interface between user and openstack-registration. It provide a HTTP API based
+on REST good practice.
 """
 # -*- coding: utf-8 -*-
 
@@ -14,6 +15,8 @@ from registration.Backend import OpenLdap
 from registration.exceptions import InvalidX500DN
 from registration.utils import *  # pylint: disable=unused-wildcard-import, wildcard-import
 
+from registration.api.users import user_get
+
 LOGGER = logging.getLogger("registration")
 LOGGER_ERROR = logging.getLogger("registration_error")
 
@@ -21,6 +24,7 @@ LOGGER_ERROR = logging.getLogger("registration_error")
 def user_is_authenticate(request):
     """
     Return the status of current user
+
     :param request: Web request
     :return: JSonResponse
     """
@@ -36,12 +40,15 @@ def user_is_authenticate(request):
 def user_is_admin(request, spec=None):
     """
     Return True if user is a administrator
+
+    :param spec: ??
     :param request: Web request
     :return: JSonResponse
     """
     data = dict()
     data['admin'] = 'False'
     user = UserInfo.objects.filter(username=request.user)  # pylint: disable=no-member
+    print spec
 
     if spec == 'dataTable':
         data['list'] = {}
@@ -147,7 +154,7 @@ def logs_get_html(request):
     :param request: Web request
     :return: void
     """
-    return render(request, 'logs_get_html.html')
+    return render(request, 'logs/get.html')
 
 
 @login_required()
@@ -184,6 +191,7 @@ def admin_dispatcher(request):  # pylint: disable=too-many-return-statements
 def admin_users_dispatcher(request):  # pylint: disable=too-many-return-statements
     """
     TODO: need dispatcher
+
     :param request: Web request
     :return: void
     """
@@ -203,7 +211,10 @@ def admin_users_dispatcher(request):  # pylint: disable=too-many-return-statemen
                 for each in users:
                     user['uid'] = each[1]['uid'][0]
                     user['mail'] = each[1]['mail'][0]
-                    user['pager'] = {'pager': each[1]['pager'][0], 'state': '', 'display': ''}
+                    try:
+                        user['pager'] = {'pager': each[1]['pager'][0], 'state': '', 'display': ''}
+                    except KeyError:
+                        user['pager'] = dict()
                     list_users.append(user)
                     user = dict()
                 data['users'] = list_users
@@ -233,7 +244,7 @@ def admin_users_dispatcher(request):  # pylint: disable=too-many-return-statemen
                     return JsonResponse(attrs)
                 except:  # pylint: disable=bare-except
                     info['info'] = 'Fail to ' + action + ' user ' + user + '.'
-                    return render(request, 'error_get_html.html', context=info)
+                    return render(request, 'error/get.html', context=info)
     else:
         return redirect('/')
 
@@ -342,7 +353,7 @@ def admin_get_html(request):
     :return:
     """
     if user_is_admin(request, spec='python')['admin'] != 'False':
-        return render(request, "admin.html")
+        return render(request, "admin/admin.html")
     return redirect('/')
 
 
@@ -354,7 +365,7 @@ def users_get_html(request):
     :return: void
     """
     if user_is_admin(request, spec='python')['admin'] != 'False':
-        return render(request, "users_get_html.html")
+        return render(request, "users/users.html")
     return redirect('/')
 
 
@@ -480,24 +491,33 @@ def logout(request):
 
 
 @login_required()
-def user_dispatcher(request):
+def user_dispatcher(request, username):
     """
-    make desc.
+    dispatch the user request to different user view depending of the request information
+        - **format**: Json or HTML
+        - **method**: currently just GET
+
+    :param username: The username of the user we want act.
     :param request: Web request
     :return: void
     """
-    uri = request.path
-    url_user = "/users/{}".format(request.user)
-
-    if uri != url_user\
-            and 'dn' not in request.GET:
-        return HttpResponseRedirect(url_user)
-    if request.method == 'GET'\
-            and 'format' in request.GET\
-            and request.GET['format'] == 'json':
-        return user_get_json(request)
-    elif request.method == 'GET':
-        return render(request, 'user_get_html.html')
+    if request.user.get_username() == username:
+        if request.method == 'GET'\
+                and 'format' in request.GET\
+                and request.GET['format'] == 'json':
+            return user_get_json(request)
+        elif request.method == 'GET':
+            return user_get.html(request)
+        else:
+            return JsonResponse({
+                'status': 'error',
+                'message': '{} method is not supported'.format(request.method)
+            })
+    else:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'permission denied'
+        })
 
 
 @login_required()
@@ -707,23 +727,14 @@ def group_get_html(request):
     :param request:
     :return:
     """
-    return render(request, 'group_get_html.html')
-
-
-@login_required()
-def user_get_html(request):
-    """
-
-    :param request:
-    :return:
-    """
-    return render(request, 'user_get_html.html')
+    return render(request, 'groups/group.html')
 
 
 @login_required()
 def user_get_json(request, spec=None):  #pylint: disable=too-many-branches, too-many-locals
     """
 
+    :param spec:
     :param request:
     :return:
     """
@@ -735,9 +746,10 @@ def user_get_json(request, spec=None):  #pylint: disable=too-many-branches, too-
     final_list = []
     final_dict = dict()
     admin_list = []
-
+    # TODO: What's spec ????
     if spec is not None:
         for uid in spec:
+            # TODO: gloops, what's that ugly thing !!!
             attrs = ldap.search_user(attributes=str(uid).split('=')[1].split(',')[0])
             if attrs != []:
                 members.append(attrs[0][1])
@@ -749,6 +761,7 @@ def user_get_json(request, spec=None):  #pylint: disable=too-many-branches, too-
             tmp['admin'] = ''
             final_list.append(tmp)
 
+        # TODO: gloops, what's that ugly thing !!!
         location = request.path_info.split('/')[2]
         user_admin = IsAdmin.objects.filter(group__group_name=location)  # pylint: disable=no-member
         if user_admin:
@@ -759,6 +772,7 @@ def user_get_json(request, spec=None):  #pylint: disable=too-many-branches, too-
         data['members'] = final_list
         return data
     elif 'email' in request.GET:
+        # TODO: What's that foo-bar thing !!!
         users = ldap.search_user(uid="foo", mail="bar")
         for each in users:
             members.append(each[1])
@@ -782,7 +796,7 @@ def home_get_html(request):
     :param request: Web request
     :return: void
     """
-    return render(request, 'home_get_html.html')
+    return render(request, 'home/get.html')
 
 
 @login_required()
@@ -795,7 +809,7 @@ def groups_get_html(request):
     data = user_is_group_admin(request, type='python')
     if data['status'] != 'True':
         return redirect('/')
-    return render(request, 'groups_get_html.html')
+    return render(request, 'groups/groups.html')
 
 
 @login_required()
@@ -828,7 +842,7 @@ def policies_get_html(request):
     :param request: Web request
     :return: void
     """
-    return render(request, 'policies_get_html.html')
+    return render(request, 'policies/get.html')
 
 
 def register_dispatcher(request):
@@ -848,7 +862,7 @@ def register_dispatcher(request):
                 attributes['DN'] = request.META['SSL_CLIENT_S_DN']
             return JsonResponse(attributes)
     else:
-        return render(request, 'register_get_html.html')
+        return render(request, 'register/get.html')
 
 
 def attributes_dispatcher(request):  # pylint: disable=too-many-statements, too-many-branches, too-many-return-statements
