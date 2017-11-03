@@ -16,7 +16,7 @@ import os
 import logging
 import ldap
 
-from django_auth_ldap.config import LDAPSearch
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
 
 from openstack_registration.utils import create_logger, create_logger_error
 from openstack_registration.config import GLOBAL_CONFIG, load_config
@@ -148,6 +148,18 @@ AUTH_LDAP_BIND_PASSWORD = GLOBAL_CONFIG['LDAP_PASSWORD']
 AUTH_LDAP_USER_SEARCH = LDAPSearch(GLOBAL_CONFIG['LDAP_BASE_OU'],
                                    ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
                                    "(uid=%(user)s)")
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(GLOBAL_CONFIG['LDAP_GROUP_OU'],
+                                    ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
+                                    "(objectClass=groupOfNames)")
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'givenName',
+    'last_name': 'sn'
+}
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_superuser": "cn=admin,ou=groups,o=cloud"
+}
+AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+AUTH_LDAP_FIND_GROUP_PERMS = True
 
 AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',

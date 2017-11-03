@@ -1,0 +1,27 @@
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+                <!--<h4 class="modal-title" id="myModalLabel">Sign In</h4>-->
+            <!--</div>-->
+            <div class="modal-body">
+                <div class="row">
+                    <!--<form class="form-signin" role="form" method="POST" action="/login">-->
+                        <!--{% csrf_token %}-->
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <label for="login-username" class="sr-only">Username</label>
+                            <input type="text" id="login-username" class="form-control" placeholder="Username" required autofocus name="username">
+
+                            <label for="login-password" class="sr-only">Password</label>
+                            <input type="password" id="login-password" class="form-control" placeholder="Password" required name="password">
+
+                            <br/>
+                            <button class="btn btn-lg btn-primary btn-block" type="submit" onclick="login('{{ csrf_token }}')">Sign on</button>
+                        </div>
+                    <!--</form>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

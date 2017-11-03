@@ -9,12 +9,11 @@ function getUserAttributes() {
     ).done(
         function (users) {
             for ( user in users ) {
-                console.log(users[user])
-                $('#username').val(users[user].uid);
-                $('#email').val(users[user].mail);
-                $('#firstname').val(users[user].firstname);
-                $('#lastname').val(users[user].lastname);
-                $('#fullname').val(users[user].fullname);
+                $('#usernameInput').val(users[user].uid);
+                $('#emailInput').val(users[user].mail);
+                $('#firstnameInput').val(users[user].firstname);
+                $('#lastnameInput').val(users[user].lastname);
+                $('#fullnameInput').val(users[user].fullname);
             }
         }
     );

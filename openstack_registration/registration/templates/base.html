@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -14,51 +13,11 @@
         <script src="/static/js/jquery-2.1.1.min.js" type="text/javascript"></script>
         <script src="/static/dataTables/datatables.min.js" type="text/javascript"></script>
         <script src="/static/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="/static/js/registration/login.js" type="text/javascript"></script>
         <script src="/static/js/registration/user.js" type="text/javascript"></script>
-        <!--<script src="/static/js/include/jquery-ui-1.10.0.min.js" type="text/javascript"></script>-->
-        <!--<script src="/static/js/include/ui-1.10.0/jquery.ui.core.min.js" type="text/javascript"></script>-->
-        <!--<script src="/static/js/include/ui-1.10.0/jquery.ui.widget.min.js" type="text/javascript"></script>-->
-        <!--<script src="/static/js/include/ui-1.10.0/jquery.ui.tabs.min.js" type="text/javascript"></script>-->
-        <!--<script src="/static/js/include/ui-1.10.0/jquery.ui.position.min.js" type="text/javascript"></script>-->
         {% block script %} {% endblock %}
         <script>
-            $(document).ready(function() {
-                $.getJSON('/logged').done(
-                    function (json) {
-                        if (json.status == 'False') {
-                            $('#login').html('<a href="/login">Login</a>');
-                        }
-                        else {
-                            $('#login').html('<a href="/users/' + json.user + '">' + json.user + '</a>');
-                            $('#logout').html('<a href="/logout"><span class="glyphicon glyphicon-log-out"></span></a>');
-
-                            $.getJSON('/isGroupAdmin').done(
-                                function (json) {
-                                    if (json.status == 'False') {
-                                        $('#isGroupAdmin').html('');
-                                    }
-                                    else {
-                                        $('#isGroupAdmin').html('<a href="/groupAdmin">Manage Group</a>');
-                                    }
-                                }
-                            );
-
-                            $.getJSON('/isAdmin').done(
-                                function (json) {
-                                    if (json.admin == 'False') {
-                                        $('#isAdmin').html('');
-                                    }
-                                    else {
-                                        $('#isAdmin').html('<a href="/admin">Admin</a>');
-                                        $('#isGroupAdmin').html('<a href="/groupAdmin">Manage Group</a>');
-                                        $('#log').html('<a href="/logs">Logs</a>');
-                                    }
-                                }
-                            );
-                        }
-                    }
-                );
-            });
+        {% include "login/scripts.js" %}
         {% block javascript %}
         {% endblock %}
         </script>
@@ -86,42 +45,28 @@
                          <li>
                              <a href="https://cloud-support.lal.in2p3.fr/" type="button" target="_blank">Support</a>
                          </li>
-                         <li id="isGroupAdmin">
-
+                         {% if request.user.is_superuser %}
+                         <li>
+                            <a href="/admin">Admin</a>
                          </li>
-                         <li id="isAdmin">
-
+                         <li>
+                            <a href="/groupAdmin">Manage Group</a>
                          </li>
-                         <li id="log">
-
+                         <li>
+                            <a href="/logs">Logs</a>
                          </li>
+                         {% endif %}
                      </ul>
                      <ul class="nav navbar-nav navbar-right">
-                         <!--<li class="dropdown">-->
-                             <!--<a href="#"-->
-                                <!--class="dropdown-toggle"-->
-                                <!--role="button"-->
-                                <!--data-toggle="dropdown"-->
-                                <!--aria-expanded="false">-->
-                                <!--Login<span class="caret"></span>-->
-                                 <!--<ul class="dropdown-menu" role="menu">-->
-                                    <!--<li>-->
-                                        <!--<a href="/login">User</a>-->
-                                    <!--</li>-->
-                                    <!--<li>-->
-                                        <!--<a href="/login">Admin</a>-->
-                                    <!--</li>-->
-                                <!--</ul>-->
-                             <!--</a>-->
-                         <!--</li>-->
-                         <li id="login">
-                             <!--<a href="/login/">Login</a>-->
-                         </li>
+                         {% if request.user.is_authenticated %}
                          <li id="logout">
-                             <!--<a href="/logout">-->
-                                <!--<span class="glyphicon glyphicon-log-out"></span>-->
-                            <!--</a>-->
+                             <a href="/logout"><span class="glyphicon glyphicon-log-out"></span></a>
                          </li>
+                         {% else %}
+                         <li id="login">
+                             <a href="#"  data-toggle="modal" data-target="#login-modal">Login</a>
+                         </li>
+                         {% endif %}
                      </ul>
                  </div>
              </div>
@@ -142,5 +87,8 @@
 
             </div>
         </div>
+
+<!-- Modal -->
+    {% include "login/modal.html" %}
     </body>
 </html>

@@ -22,6 +22,7 @@ GLOBAL_CONFIG = {
     # [auth]
     'LDAP_SERVER': 'ldap://127.0.0.1',
     'LDAP_BASE_OU': 'ou=users,o=cloud',
+    'LDAP_GROUP_OU': 'ou=groups,o=cloud',
 
     # [django]
     'DJANGO_SECRET_KEY': 'This should be change',  # Should be declare to allow doc generation
@@ -49,13 +50,15 @@ AUTH_OPTIONS = {
     - **LDAP_USER**: DN of ldap user (file option: *bind_dn*)
     - **LDAP_PASSWORD**: password of ldap user (file option: *password*)
     - **LDAP_BASE_OU**: The base search for user in ldap
+    - **LDAP_GROUP_OU**: The base search for group in ldap
 
 """
 
 MAIN_OPTIONS = {
     'DEBUG_LVL': 'debug_lvl',
     'LOG_DIR': 'logdir',
-    'REGISTRATION_URL': 'register_url'
+    'REGISTRATION_URL': 'register_url',
+    'ADMIN_UID': 'admin'
 }
 """
 

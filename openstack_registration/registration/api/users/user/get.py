@@ -7,10 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 
 from registration.Backend import OpenLdap
+from registration.decorators import owner_required
 
 
-@login_required()
-def html(request):
+@login_required
+def html(request, username):
     """
     Return a HTML rendering for GET request in /users/*username*
 
@@ -20,7 +21,7 @@ def html(request):
     return render(request, 'users/user.html')
 
 
-@login_required()
+@owner_required
 def json(request, username):
     """
     Return a Json rendering for GET request in /users/*username*
@@ -29,9 +30,6 @@ def json(request, username):
     :param username: username
     :return: JsonResponse
     """
-    if request.user == username:
-        backend = OpenLdap()
-        response = backend.get(username=username)
-    else:
-        raise PermissionDenied
+    backend = OpenLdap()
+    response = backend.get(username=username)
     return JsonResponse(response, safe=False)

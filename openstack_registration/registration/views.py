@@ -9,13 +9,13 @@ from django.http import JsonResponse, HttpResponseRedirect, QueryDict
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 
-from openstack_registration.settings import GLOBAL_CONFIG
+from registration.datastore.UserInfoAccess import UserInfoAccess
 
 from registration.Backend import OpenLdap
 from registration.exceptions import InvalidX500DN
 from registration.utils import *  # pylint: disable=unused-wildcard-import, wildcard-import
 
-from registration.api.users import user_get
+from registration import api
 
 LOGGER = logging.getLogger("registration")
 LOGGER_ERROR = logging.getLogger("registration_error")
@@ -48,7 +48,7 @@ def user_is_admin(request, spec=None):
     data = dict()
     data['admin'] = 'False'
     user = UserInfo.objects.filter(username=request.user)  # pylint: disable=no-member
-    print spec
+    is_admin = UserInfoAccess.is_admin(request.user.get_username())
 
     if spec == 'dataTable':
         data['list'] = {}
@@ -81,7 +81,7 @@ def user_is_admin(request, spec=None):
         return data
 
     if user:
-        is_admin = user[0].admin
+        is_admin = UserInfoAccess.is_admin(request.user.get_username())
         if is_admin is True:
             data['admin'] = 'True'
     if spec == 'python':
@@ -219,7 +219,7 @@ def admin_users_dispatcher(request):  # pylint: disable=too-many-return-statemen
                     user = dict()
                 data['users'] = list_users
                 return JsonResponse(data)
-            return users_get_html(request)
+            return api.users.get.html(request)
         elif request.method == 'PUT':
             info = dict()
             data = QueryDict(request.body).dict()
@@ -358,18 +358,6 @@ def admin_get_html(request):
 
 
 @login_required()
-def users_get_html(request):
-    """
-    make desc.
-    :param request: Web request
-    :return: void
-    """
-    if user_is_admin(request, spec='python')['admin'] != 'False':
-        return render(request, "users/users.html")
-    return redirect('/')
-
-
-@login_required()
 def user_is_group_admin(request, type=None):  # pylint: disable=redefined-builtin
     """
     make desc.
@@ -465,11 +453,12 @@ def login(request):
         user = auth.authenticate(username=request.POST['username'].lower(),
                                  password=request.POST['password'])
         if user is not None:
-            redirect_page = "/users/{}".format(request.POST['username'].lower())
             auth.login(request, user)
             LOGGER.info("USER LOGIN     :: User %s is connected from %s",
                         request.user, request.META.get('REMOTE_ADDR'))
-            return HttpResponseRedirect(redirect_page)
+            return JsonResponse({
+                'status': 'success'
+            })
         info['info'] = 'Your login/password are wrong'
         LOGGER.info("LOGIN FAILED   :: Attempt to login with user '%s' from %s",
                     request.POST['username'], request.META.get('REMOTE_ADDR'))
@@ -490,8 +479,7 @@ def logout(request):
     return redirect('/')
 
 
-@login_required()
-def user_dispatcher(request, username):
+def user_dispatcher(request, username, attributes=None):
     """
     dispatch the user request to different user view depending of the request information
         - **format**: Json or HTML
@@ -501,23 +489,7 @@ def user_dispatcher(request, username):
     :param request: Web request
     :return: void
     """
-    if request.user.get_username() == username:
-        if request.method == 'GET'\
-                and 'format' in request.GET\
-                and request.GET['format'] == 'json':
-            return user_get_json(request)
-        elif request.method == 'GET':
-            return user_get.html(request)
-        else:
-            return JsonResponse({
-                'status': 'error',
-                'message': '{} method is not supported'.format(request.method)
-            })
-    else:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'permission denied'
-        })
+    return api.users.dispatcher.dispatcher(request, username=username)
 
 
 @login_required()
@@ -908,10 +880,6 @@ def attributes_dispatcher(request):  # pylint: disable=too-many-statements, too-
     elif 'passwords' in request.GET:
         password = request.GET['passwords']
         attributes['password'] = encode_password(password)
-        print type(password)
-        print password
-        print type(attributes['password'])
-        print attributes['password']
         return render(request, 'users_get_html.html')
 
     elif 'uid' in request.GET:

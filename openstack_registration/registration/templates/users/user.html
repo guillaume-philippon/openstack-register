@@ -12,7 +12,7 @@ $(document).click(function() {
 
 $(document).ready(function() {
     disable_change_button();
-    get_attributes();
+    getUserAttributes();
     show_modal();
     $('#checkPasswords').click(function() {
         check_actual_password();
@@ -30,17 +30,6 @@ function show_modal() {
     $('#changePassword').click(function() {
         $('#modalPassword').modal('show');
     });
-}
-
-function get_attributes() {
-    $.getJSON(location.pathname, { format: 'json' }).done(
-        function (json) {
-            $('#usernameInput').val(json.attrs.uid);
-            $('#emailInput').val(json.attrs.mail);
-            $('#firstnameInput').val(json.attrs.givenName);
-            $('#lastnameInput').val(json.attrs.sn);
-        }
-    );
 }
 
 function check_actual_password() {
