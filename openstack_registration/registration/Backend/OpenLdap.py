@@ -14,7 +14,7 @@ from openstack_registration.config import GLOBAL_CONFIG
 
 
 # TODO: Should be named OpenLdapBackend to avoid miss-lead
-class OpenLdap(object):
+class OpenLdap():
     """
     OpenLdap Backend support is based on PrototypeBackend
     """
@@ -242,7 +242,7 @@ class OpenLdapBackend(object):
         """
         initialize Backend
         """
-        super(OpenLdap, self).__init__()
+        super(OpenLdapBackend, self).__init__()
         self.server = GLOBAL_CONFIG['LDAP_SERVER']
         self.user = GLOBAL_CONFIG['LDAP_USER']
         self.password = GLOBAL_CONFIG['LDAP_PASSWORD']

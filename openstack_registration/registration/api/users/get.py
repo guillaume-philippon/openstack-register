@@ -16,7 +16,7 @@ def html(request):
     :param request: Web request
     :return: HTTP rendering
     """
-    response = render(request, "users/users.html")
+    response = render(request, "users/home.html")
     return response
 
 

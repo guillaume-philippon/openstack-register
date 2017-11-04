@@ -53,4 +53,4 @@ def user_information_html(request, username):  # pylint: disable=unused-argument
     :param username: required for @owner_required decorator
     :return: HTTP rendering
     """
-    return render(request, 'users/user.html')
+    return render(request, 'users/user/home.html')
