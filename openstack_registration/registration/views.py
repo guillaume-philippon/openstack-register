@@ -5,14 +5,13 @@ on REST good practice.
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponseRedirect, QueryDict
+from django.http import JsonResponse, QueryDict
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 
 from registration.datastore.UserInfoAccess import UserInfoAccess
 
 from registration.Backend import OpenLdap
-from registration.exceptions import InvalidX500DN
 from registration.utils import *  # pylint: disable=unused-wildcard-import, wildcard-import
 
 from registration import api
@@ -440,30 +439,48 @@ def modify_group_admin(request, user, group, action):
 
 def login(request):
     """
-    TODO: make desc.
-    :param request: Web request
-    :return: void
-    """
-    info = dict()
+    login view is used to log user on openstack-registration. It return a JSonResponse output with
+    the status of login
 
+        - **success**: user is logged
+        - **failure**: user is not logged
+
+    :param request: Web request
+    :return: JSonResponse
+    """
+    # If user is already authenticated, we return a success status
     if request.user.is_authenticated():
-        redirect_page = "/users/{}".format(request.user)
-        return redirect(redirect_page)
-    if request.method == "POST":
+        response = JsonResponse({
+            'status': 'success'
+        })
+    # We use post method to authenticate user. we trap it to compute it.
+    elif request.method == "POST":
         user = auth.authenticate(username=request.POST['username'].lower(),
                                  password=request.POST['password'])
+        # If user is not None, then user is authenticated
         if user is not None:
             auth.login(request, user)
             LOGGER.info("USER LOGIN     :: User %s is connected from %s",
                         request.user, request.META.get('REMOTE_ADDR'))
-            return JsonResponse({
+            response = JsonResponse({
                 'status': 'success'
             })
-        info['info'] = 'Your login/password are wrong'
-        LOGGER.info("LOGIN FAILED   :: Attempt to login with user '%s' from %s",
-                    request.POST['username'], request.META.get('REMOTE_ADDR'))
-        return render(request, "login.html", context=info)
-    return render(request, "login.html")
+        # else the username or password is invalid
+        else:
+            LOGGER.info("LOGIN FAILED   :: Attempt to login with user '%s' from %s",
+                        request.POST['username'], request.META.get('REMOTE_ADDR'))
+            response = JsonResponse({
+                'status': 'failure',
+                'message': 'invalid username or password'
+            })
+    # If it s not a POST method, it s not supported by the view
+    else:
+        response = JsonResponse({
+            'status': 'failure',
+            'message': 'method {method} is not supported on login'
+                       ' page'.format(method=request.method)
+        })
+    return response
 
 
 @login_required()
@@ -477,19 +494,6 @@ def logout(request):
                 request.user, request.META.get('REMOTE_ADDR'))
     auth.logout(request)
     return redirect('/')
-
-
-def user_dispatcher(request, username, attributes=None):
-    """
-    dispatch the user request to different user view depending of the request information
-        - **format**: Json or HTML
-        - **method**: currently just GET
-
-    :param username: The username of the user we want act.
-    :param request: Web request
-    :return: void
-    """
-    return api.users.dispatcher.dispatcher(request, username=username)
 
 
 @login_required()
@@ -762,7 +766,7 @@ def user_get_json(request, spec=None):  #pylint: disable=too-many-branches, too-
     return JsonResponse(data)
 
 
-def home_get_html(request):
+def home(request):
     """
     make desc.
     :param request: Web request
@@ -808,33 +812,14 @@ def groups_get_json(request, spec=None):
     return JsonResponse(data)
 
 
-def policies_get_html(request):
+def policies(request):
     """
-    make desc.
-    :param request: Web request
-    :return: void
-    """
-    return render(request, 'policies/get.html')
+    Display policies web pages, only available throught html format.
 
-
-def register_dispatcher(request):
-    """
-    make desc.
     :param request: Web request
-    :return: void
+    :return: HTTP rendering
     """
-    attributes = dict()
-    if 'format' in request.GET:
-        if 'adduser' in request.GET:
-            attributes = QueryDict(request.body).dict()
-            add_user(request, attributes)
-            return JsonResponse(attributes)
-        elif 'cert' in request.GET:
-            if 'SSL_CLIENT_S_DN' in request.META:
-                attributes['DN'] = request.META['SSL_CLIENT_S_DN']
-            return JsonResponse(attributes)
-    else:
-        return render(request, 'register/get.html')
+    return render(request, 'policies.html')
 
 
 def attributes_dispatcher(request):  # pylint: disable=too-many-statements, too-many-branches, too-many-return-statements
@@ -916,32 +901,6 @@ def attributes_dispatcher(request):  # pylint: disable=too-many-statements, too-
         project = normalize_string(request.GET['project'])
         attributes['project'] = project
         return JsonResponse(attributes)
-
-
-def add_user(request, attributes):
-    """
-    make desc.
-    :param request: Web request
-    :param attributes: attributes
-    :return: void
-    """
-    GLOBAL_CONFIG['project'] = ''
-    ldap = OpenLdap()
-    username = str(attributes['username'])
-    email = str(attributes['email'])
-    firstname = str(attributes['firstname'])
-    lastname = str(attributes['lastname'])
-    x500dn = str(attributes['x500dn'])
-    GLOBAL_CONFIG['project'] = str(attributes['project'])
-    password = encode_password(unicode(attributes['password']).encode(encoding='utf-8'))
-
-    try:
-        ldap.add_user(username, email, firstname, lastname, x500dn, password)
-        LOGGER.info("USER CREATED   :: Operator : %s  :: Attributes : username=%s, firstname=%s,"
-                    " lastname=%s, email=%s ", request.user, username, firstname, lastname, email)
-    except InvalidX500DN:
-        exit(1)
-    send_mail(username, firstname, lastname, email, '', '', 'add')
 
 
 def activate_user(request):

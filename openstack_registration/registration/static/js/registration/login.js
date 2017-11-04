@@ -6,15 +6,15 @@ function login(csrf) {
         csrfmiddlewaretoken: csrf,
         username: $('#login-username').val(),
         password: $('#login-password').val()
-    }
+    };
     $.post('/login',post_data, function(data){
         if (data.status == 'success') {
-            $('#login-modal').modal
-            $(location).attr('href', '/users/' + post_data['username'])
+            $('#login-modal').modal();
+            $(location).attr('href', '/users/' + post_data.username);
         } else {
-            $('#login-modal').shake(3, 7, 800)
+            $('#login-modal').shake(3, 7, 800);
         }
-    })
+    });
 }
 
 /* Allow modal to be shaked */

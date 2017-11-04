@@ -1,34 +1,73 @@
-{% extends "core/base.html" %}
-{% load i18n %}
-{% block title %}OpenStack - User{% endblock %}
-
-{% block javascript %}
-var $oldPassword = 'False';
-var $newPassword = 'False';
-
-$(document).click(function() {
-
-});
-
-$(document).ready(function() {
-    disable_change_button();
-    getUserAttributes();
-    show_modal();
-    $('#checkPasswords').click(function() {
-        check_actual_password();
-        check_password_constraints();
-        <!--enable_change_button();-->
+/* function to get all users information and populate datable */
+function getUsers() {
+    $("#table-members").DataTable( {
+        ajax: {
+            url: location.pathname,
+            data: {
+                'format': 'json',
+            },
+            dataSrc: function (users) {
+                $.each(users, function(uid, attributes){
+                    attributes.icon = '<span class="glyphicon glyphicon-pencil"></span>';
+                    attributes.action = 'Actions';
+                });
+                return users;
+            },
+        },
+        columns: [
+            { data: 'icon'},
+            { data: 'uid'},
+            { data: 'mail'},
+            { data: 'action' },
+        ],
+//        order: [[ 0, 'desc' ]],
+//        iDisplayLength: 10,
+//        stateSave: true,
+//        lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "ALL"] ],
     });
-    hide_see_password();
-    $('#clearButton, #closeButton').click(function() {
-        clear_form();
-    });
-    change_password();
-});
+}
 
-function show_modal() {
-    $('#changePassword').click(function() {
-        $('#modalPassword').modal('show');
+function colorLine () {
+    var numberOfRows;
+    var eachRow;
+    eachRow = document.getElementById('users_table').rows;
+    numberOfRows = eachRow.length;
+    for (var i = 0; i < numberOfRows; i++) {
+        if (eachRow[i].className == 'odd') {
+            eachRow[i].setAttribute('style', 'background: #f3f3f3');
+        }
+        else {
+            eachRow[i].removeAttribute('style');
+        }
+    }
+}
+
+function changePasswordModal(user) {
+    $('#myModalLabel')[0].firstChild.data = 'Change ' + user + ' password:';
+    $('#newPasswordLabel')[0].firstChild.data = 'New ' + user + ' password *:';
+    $('#passwordLabel')[0].firstChild.data = 'Retype new ' + user + ' password *:';
+    $user = user;
+    $('#adminModalPassword').modal('show');
+}
+
+
+
+function changeState(username, action) {
+    $.ajaxSetup({
+        beforeSend : function(xhr) {
+            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}" );
+        }
+    });
+    $.ajax({
+        url: location.pathname,
+        type: 'PUT',
+        data: { 'format': 'json',
+                'user': username,
+                'action': action,
+        },
+        success: function(json) {
+            $("#table_id").DataTable().ajax.reload(null, false);
+        }
     });
 }
 
@@ -59,7 +98,6 @@ function check_password_constraints() {
                 $newPassword = 'False';
             }
             else if ( json.check == 'success' ) {
-                <!--document.getElementById("errorPassword").innerHTML = '';-->
                 $newPassword = 'True';
                 enable_change_button();
             }
@@ -69,16 +107,13 @@ function check_password_constraints() {
     if ( $("#newPasswordInput").val() != $("#reNewPasswordInput").val() ) {
             document.getElementById("errorPassword").innerHTML = "Password aren't matching !";
     }
-    else if ( $("#newPasswordInput").val() == $('#actualPasswordInput').val() ) {
-            document.getElementById("errorPassword").innerHTML = "Old and new password are the same !";
-    }
     else {
         document.getElementById("errorPassword").innerHTML = '';
     }
 }
 
 function enable_change_button() {
-    if ( ($oldPassword == 'True') && ($newPassword == 'True') && (document.getElementById("errorPassword").innerHTML == '')) {
+    if ( ($oldPassword == 'True') && ($newPassword == 'True') && (document.getElementById("errorPassword").innerHTML === '')) {
         $('#changeButton').removeAttr('disabled');
     }
     else {
@@ -100,9 +135,11 @@ function change_password() {
             }
         });
         $.ajax({
-            url: '/attributes/?format=json&changePassword',
+            url: location.pathname,
             type: 'PUT',
-            data: { 'changePassword': $('#newPasswordInput').val() },
+            data: { 'password': $('#newPasswordInput').val(),
+                    'user' : $user,
+            },
             success: function(json) {
                 if (json.status == 'success') {
                     document.getElementById("errorPassword").innerHTML = 'Password has been changed !';
@@ -165,61 +202,3 @@ function clear_form() {
     $oldPassword = 'False';
     $newPassword = 'False';
 }
-
-{% endblock %}
-
-{% block content %}
-<div>
-    <h2>User profile</h2>
-
-    <p>
-      Here you can check your profile and change your password.
-    </p>
-
-    <form id="form">{% csrf_token %}
-        <div class="form-group col-sm-10">
-            <label id="usernameLabel" class="control-label col-sm-2">Username: </label>
-            <div id="username" class="col-sm-3">
-                <input id="usernameInput" type="text" value="" class="form-control" placeholder="Username" aria-describedby="basic-addon1" disabled>
-            </div>
-            <!--<div class="col-sm-5">-->
-                <!--<p id="errorUsername" style="color:red"></p>-->
-            <!--</div>-->
-        </div>
-        <div class="form-group col-sm-10">
-            <label id="emailLabel" class="control-label col-sm-2">Email address: </label>
-            <div id="email" class="col-sm-3">
-                <input id="emailInput" type="text" value="" class="form-control" placeholder="Email address" aria-describedby="basic-addon1" disabled>
-            </div>
-            <!--<div class="col-sm-5">-->
-                <!--<p id="errorEmail" style="color:red"></p>-->
-            <!--</div>-->
-        </div>
-        <div class="form-group col-sm-10">
-            <label id="firstnameLabel" class="control-label col-sm-2">Firstname: </label>
-            <div id="firstname" class="col-sm-3">
-                <input id="firstnameInput" type="text" value="" class="form-control" placeholder="Firstname" aria-describedby="basic-addon1" disabled>
-            </div>
-            <!--<div class="col-sm-5">-->
-                <!--<p id="errorFirstname" style="color:red"></p>-->
-            <!--</div>-->
-        </div>
-        <div class="form-group col-sm-10">
-            <label id="lastnameLabel" class="control-label col-sm-2">Lastname: </label>
-            <div id="lastname" class="col-sm-3">
-                <input id="lastnameInput" type="text" value="" class="form-control" placeholder="Lastname" aria-describedby="basic-addon1" disabled>
-            </div>
-            <!--<div class="col-sm-5">-->
-                <!--<p id="errorLastname" style="color:red"></p>-->
-            <!--</div>-->
-        </div>
-        <div class="col-sm-5">
-            <button id="changePassword" class="btn btn-primary" type="button">Change your password</button>
-        </div>
-    </form>
-</div>
-
-{% include "users/modal_password.html" %}
-
-{% endblock %}
-

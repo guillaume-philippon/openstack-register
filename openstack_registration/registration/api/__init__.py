@@ -19,5 +19,4 @@ API method supported:
 - DELETE: delete a entry
 
 """
-from registration.api import users
-from registration.api.users import user, get, dispatcher
+from registration.api import users, register

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %} {% endblock %}</title>
+
+        <link href="/static/contrib/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/contrib/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="/static/contrib/datatable/datatables.min.css" rel="stylesheet">
+
+
+        <link href="/static/css/register.css" rel="stylesheet">
+        <meta id="meta" charset="UTF-8">
+        {% block css %} {% endblock %}
+        <style type="text/css">
+
+        </style>
+    </head>
+
+    <body>
+{% include "core/scripts.html" %}
+{% block script %} {% endblock %}
+<script>
+{% block javascript %}
+
+{% include "login/scripts.js" %}
+
+{% endblock %}
+</script>
+
+
+<!-- Include navigation bar  -->
+{% include "core/navigation.html" %}
+
+<!-- main content of web page -->
+<div class="container" role="main">
+    <div class="row">
+        <div class="col-sm-2">
+            <img id="lateral" src="/static/fonts/openstack-lal-s-vertical.png">
+        </div>
+        <div class="col-sm-10">
+            {% block head %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
+
+    </div>
+</div>
+
+<!-- Include login modal -->
+{% include "login/modal.html" %}
+
+
+    </body>
+</html>

@@ -278,12 +278,12 @@ class OpenLdap(PrototypeBackend):
         :param username: username of user we want to get information
         :return: list or dict
         """
-        response = dict()
+        response = list()
         users = self.connection.search_s(self.base_ou, ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
                                          "(&(objectClass=person)(uid={uid}))".format(uid=username),
                                          ['uid', 'mail', 'givenName', 'sn', 'cn', 'pager'])
         for _, attributes in users:
-            response[attributes['uid'][0]] = (self._ldap_to_dict(attributes))
+            response.append(self._ldap_to_dict(attributes))
         return response
 
     @staticmethod

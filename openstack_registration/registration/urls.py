@@ -14,30 +14,41 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.views.generic.base import RedirectView
 
-from registration import views
+from registration import views, api
 
 urlpatterns = [  # pylint: disable=invalid-name
-    # Login / logout view
+    # home view
+    url(r'^$', views.home),
+
+    # login / logout view
     url(r'^login', views.login),
     url(r'^logout', views.logout),
 
-    url(r'^admin/$', views.admin_dispatcher),
-    url(r'^admin/users', views.admin_users_dispatcher),
-    url(r'^$', views.home_get_html),
-    url(r'^/home$', views.home_get_html),
-    url(r'^policies', views.policies_get_html),
-    url(r'^logs$', views.logs_dispatcher),
-    url(r'^register', views.register_dispatcher),
-    url(r'^attributes', views.attributes_dispatcher),
-    url(r'^action', views.activate_user),
-    url(r'^logged', views.user_is_authenticate),
-    url(r'^isGroupAdmin', views.user_is_group_admin),
-    url(r'^isAdmin', views.user_is_admin),
-    url(r'^groupAdmin/$', views.groups_dispatcher),
-    url(r'^groupAdmin/[\w]+', views.group_dispatcher),
-    url(r'^users/(?P<username>[\w]+)$', views.user_dispatcher),
-    url(r'^users/(?P<username>[\w]+)/(?P<attributes>[\w]+)$', views.user_dispatcher),
-    url(r'^users/$', RedirectView.as_view(url='/users/connected', permanent=False))
+    # users view
+    url(r'^users[/]?$', api.users.dispatcher),
+    url(r'^users/(?P<username>[\w]+)$', api.users.dispatcher),
+    url(r'^users/(?P<username>[\w]+)/(?P<attributes>[\w]+)$', api.users.dispatcher),
+
+    # Administration view
+    # url(r'^admin/$', views.admin_dispatcher),
+    # url(r'^admin/users', views.admin_users_dispatcher),
+
+    # Policies view
+    url(r'^policies', views.policies),
+
+    # logs view
+    # url(r'^logs$', views.logs_dispatcher),
+
+    # Registration view
+    # url(r'^register', api.register.dispatcher),
+
+    # Watcha view
+    # url(r'^attributes', views.attributes_dispatcher),
+    # url(r'^action', views.activate_user),
+    # url(r'^logged', views.user_is_authenticate),
+    # url(r'^isGroupAdmin', views.user_is_group_admin),
+    # url(r'^isAdmin', views.user_is_admin),
+    # url(r'^groupAdmin/$', views.groups_dispatcher),
+    # url(r'^groupAdmin/[\w]+', views.group_dispatcher),
 ]

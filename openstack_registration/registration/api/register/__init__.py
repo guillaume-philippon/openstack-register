@@ -1,26 +1,25 @@
 """
-Provide RESTful API for uri://users/*username* request
+Provide a support for uri://register call
 """
-from registration.api.users.user import get as user_get
+from registration.api.register import get as register_get
 
 
-def dispatcher(request, username):
+def dispatcher(request):
     """
     dispatcher function is defined on __init__ file to avoid some strange call and have a clear call
     like :
     .. code: python
 
       from registration import api
-      api.users.user.dispatcher
+      api.register.dispatcher
 
     :param request: Web request
-    :param username: username
     :return: HTTP rendering
     """
     response = None
-    if request.method == "GET":
+    if request.method == 'GET':
         if 'format' in request.GET and request.GET['format'] == 'json':
-            response = user_get.json(request, username=username)
+            response = register_get.json(request)
         else:
-            response = user_get.html(request, username=username)
+            response = register_get.html(request)
     return response

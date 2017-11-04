@@ -7,7 +7,10 @@ from registration.models import UserInfo
 from openstack_registration.config import GLOBAL_CONFIG
 
 
-class UserInfoAccess(object):
+class UserInfoAccess(object):  # pylint: disable=too-few-public-methods
+    """
+    User info access is a abstraction class of UserInfo model
+    """
     def __init__(self):
         """
         Initialisation of UserInfoAccess class. Mainly do nothing
@@ -26,8 +29,8 @@ class UserInfoAccess(object):
         :return: Boolean
         """
         response = False
-        user = UserInfo.objects.filter(username=username)
-        if len(user) > 0:
+        user = UserInfo.objects.filter(username=username)  # pylint: disable=no-member
+        if user:
             response = user[0].admin
         elif username == GLOBAL_CONFIG['ADMIN_UID']:
             response = True
