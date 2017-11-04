@@ -1,0 +1,2 @@
+Module openstack_registration
+=============================
