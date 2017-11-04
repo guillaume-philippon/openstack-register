@@ -21,8 +21,9 @@ registration.api.users.user
 .. automodule:: registration.api.users.user
     :members:
 
-registration.api.register
--------------------------
-.. automodule:: registration.api.register
+registration.Backend.OpenLdap
+-----------------------------
+
+.. automodule:: registration.Backend.OpenLdap
     :members:
 

@@ -7,7 +7,7 @@ import json as core_json
 from django.http import JsonResponse
 
 from registration.decorators import owner_required
-from registration.Backend.OpenLdap import OpenLdap
+from registration.Backend.OpenLdap import OpenLdapUserBackend
 
 
 @owner_required
@@ -20,8 +20,8 @@ def json(request, username):  # pylint: disable=unused-argument
     :return: Json rendering
     """
     response = dict()
-    ldap = OpenLdap()
+    ldap = OpenLdapUserBackend()
     attributes = core_json.loads(request.body.decode('utf-8'))
-    ldap.modify_user(username=username, attributes=attributes)
+    ldap.modify(username=username, attributes=attributes)
     response = attributes
     return JsonResponse(response)

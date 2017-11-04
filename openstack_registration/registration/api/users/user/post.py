@@ -5,7 +5,7 @@ user creation. You will raise AlreadyExist exception if user exist.
 from django.http import JsonResponse
 from django.contrib import auth
 
-from registration.Backend.OpenLdap import OpenLdap
+from registration.Backend.OpenLdap import OpenLdapUserBackend
 
 
 def json(request, username):  # pylint: disable=unused-argument
@@ -16,7 +16,7 @@ def json(request, username):  # pylint: disable=unused-argument
     :param username: username
     :return: Json rendering
     """
-    ldap = OpenLdap()
+    ldap = OpenLdapUserBackend()
     attributes = {
         'username': username,
         'lastname': request.POST['lastname'],
@@ -24,7 +24,7 @@ def json(request, username):  # pylint: disable=unused-argument
         'password': request.POST['password'],
         'email': request.POST['email']
     }
-    ldap.create_user(attributes)
+    ldap.create(attributes)
 
     # After creating the user, we automaticaly logged him
     user = auth.authenticate(username=username,

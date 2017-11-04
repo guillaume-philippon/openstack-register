@@ -1,5 +1,4 @@
 # pylint: skip-file
 # -*- coding: utf-8 -*-
 
-from OpenLdap import *
-from PrototypeBackend import *
+from OpenLdap import OpenLdap, OpenLdapUserBackend

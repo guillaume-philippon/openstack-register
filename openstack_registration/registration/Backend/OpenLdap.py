@@ -233,7 +233,48 @@ class OpenLdap(object):
             attrs['status'] = 'fail'
         return attrs
 
-    def create_user(self, attributes):
+
+class OpenLdapBackend(object):
+    """
+    Provide commun tools for OpenLDAP backend support.
+    """
+    def __init__(self):
+        """
+        initialize Backend
+        """
+        super(OpenLdap, self).__init__()
+        self.server = GLOBAL_CONFIG['LDAP_SERVER']
+        self.user = GLOBAL_CONFIG['LDAP_USER']
+        self.password = GLOBAL_CONFIG['LDAP_PASSWORD']
+        self.base_ou = GLOBAL_CONFIG['LDAP_BASE_OU']
+        self.connection = ldap.initialize(self.server)
+
+        try:
+            self.connection.simple_bind_s(self.user, self.password)
+        except:  # pylint: disable=bare-except
+            print 'error during openLdap connection'
+
+
+class OpenLdapUserBackend(OpenLdapBackend):
+    """
+    Provide tools to manage user store on LDAP backend.
+    """
+    def get(self, username='*'):
+        """
+        Return a list of users based on filter
+
+        :param username: username of user we want to get information
+        :return: list or dict
+        """
+        response = list()
+        users = self.connection.search_s(self.base_ou, ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
+                                         "(&(objectClass=person)(uid={uid}))".format(uid=username),
+                                         ['uid', 'mail', 'givenName', 'sn', 'cn', 'pager'])
+        for _, attributes in users:
+            response.append(self._ldap_to_dict(attributes))
+        return response
+
+    def create(self, attributes):
         """
         Create a ldap user with all their attributes
 
@@ -266,22 +307,7 @@ class OpenLdap(object):
         except ldap.SERVER_DOWN:  # pylint: disable=no-member
             pass
 
-    def get(self, username='*'):
-        """
-        Return a list of users based on filter
-
-        :param username: username of user we want to get information
-        :return: list or dict
-        """
-        response = list()
-        users = self.connection.search_s(self.base_ou, ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                         "(&(objectClass=person)(uid={uid}))".format(uid=username),
-                                         ['uid', 'mail', 'givenName', 'sn', 'cn', 'pager'])
-        for _, attributes in users:
-            response.append(self._ldap_to_dict(attributes))
-        return response
-
-    def modify_user(self, username, attributes):
+    def modify(self, username, attributes):
         """
         Modify a user attributes
 

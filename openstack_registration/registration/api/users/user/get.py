@@ -4,7 +4,7 @@ Manage all get method for users REST API
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from registration.Backend import OpenLdap
+from registration.Backend import OpenLdapUserBackend
 from registration.decorators import owner_required
 
 
@@ -16,7 +16,7 @@ def html(request, username):
     :param username: username of the user
     :return: HTTP
     """
-    backend = OpenLdap()
+    backend = OpenLdapUserBackend()
     user = backend.get(username=username)
 
     # If the response is empty, then when want to create a new user. So we load register page
@@ -38,7 +38,7 @@ def json(request, username):  # pylint: disable=unused-argument
     :param username: username
     :return: JsonResponses
     """
-    backend = OpenLdap()
+    backend = OpenLdapUserBackend()
     response = backend.get(username=username)
     return JsonResponse(response, safe=False)
 
