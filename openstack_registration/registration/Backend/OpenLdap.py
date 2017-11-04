@@ -301,6 +301,8 @@ class OpenLdap(PrototypeBackend):
             self.connection.add_s(user, user_attributes)
         except ldap.INVALID_SYNTAX:  # pylint: disable=no-member
             raise InvalidX500DN('')
+        except ldap.SERVER_DOWN:  # pylint: disable=no-member
+            pass
 
     def get(self, username='*'):
         """

@@ -5,13 +5,13 @@
                 <div class="row form-register">
 
                     <!-- Username -->
-                    <div class="form-group">
+                    <div class="form-group has-error" id="register-group-username">
                         <div class="col-sm-4">
                             <label id="usernameLabel" class="control-label">Username: </label>
                         </div>
                         <div class="col-sm-8">
-                            <input style="border-color:red;" id="register-username" type="text"
-                                   value="" class="form-control col-sm-8" placeholder="Username"
+                            <input id="register-username" type="text"
+                                   value="" class="form-control" placeholder="Username"
                                    aria-describedby="basic-addon1">
                         </div>
                     </div>
@@ -19,12 +19,12 @@
                     <br />
                     <br />
                     <!-- email -->
-                    <div class="form-group">
+                    <div class="form-group has-error" id="register-group-email">
                         <div class="col-sm-4">
-                            <label id="emailLabel" class="control-label col-sm-2">Email: </label>
+                            <label id="emailLabel" class="control-label">Email: </label>
                         </div>
                         <div class="col-sm-8">
-                            <input style="border-color:red;" id="register-email" type="text"
+                            <input id="register-email" type="text"
                                    value="" class="form-control" placeholder="Email address"
                                    aria-describedby="basic-addon1">
                         </div>
@@ -33,13 +33,13 @@
                     <br />
                     <br />
                     <!-- firstname -->
-                    <div class="form-group">
+                    <div class="form-group has-error" id="register-group-firstname">
                         <div class="col-sm-4">
                             <label id="firstnameLabel"
                                    class="control-label">Firstname: </label>
                         </div>
                         <div class="col-sm-8">
-                            <input style="border-color:red;" id="register-firstname" type="text"
+                            <input id="register-firstname" type="text"
                                    value="" class="form-control" placeholder="Firstname"
                                    aria-describedby="basic-addon1">
                         </div>
@@ -48,13 +48,13 @@
                     <br />
                     <br />
                     <!-- lastname -->
-                    <div class="form-group">
+                    <div class="form-group has-error" id="register-group-lastname">
                         <div class="col-sm-4">
                             <label id="lastnameLabel"
-                                   class="control-label col-sm-2">Lastname: </label>
+                                   class="control-label">Lastname: </label>
                         </div>
                         <div class="col-sm-8">
-                            <input style="border-color:red;" id="register-lastname" type="text"
+                            <input id="register-lastname" type="text"
                                    value="" class="form-control" placeholder="Lastname"
                                    aria-describedby="basic-addon1">
                         </div>
@@ -63,7 +63,7 @@
                     <br />
                     <br />
                     <!-- Project -->
-                    <div class="form-group">
+                    <div class="form-group" id="register-group-project">
                         <div class="col-sm-4">
                             <label id="projectLabel" class="control-label">Project
                                 (optional): </label>
@@ -72,55 +72,46 @@
                             <input style="" id="register-project" type="text"
                                    value="" class="form-control" placeholder="Project"
                                    aria-describedby="basic-addon1">
-                            <!--<div class="input-group">-->
-                                <!--<input id="projectInput" type="text" value=""-->
-                                       <!--class="form-control" placeholder="Project wished"-->
-                                       <!--aria-describedby="basic-addon1">-->
-                                <!--<span class="input-group-addon input-group-addon-spec"><button-->
-                                        <!--type="button" id="projectIcon"-->
-                                        <!--title="Project field info" data-toggle="popover"-->
-                                        <!--data-trigger="focus" data-placement="right"-->
-                                        <!--data-content="You can put a name of a project if you know it (must be a name with letter and digit only; no accent no special character...)"-->
-                                        <!--class="btn glyphicon glyphicon-info-sign"></button></span>-->
-                            <!--</div>-->
                         </div>
                     </div>
                     <!-- End -->
                     <br />
                     <br />
                     <!-- Password -->
-                    <div class="form-group">
+                    <div class="form-group has-error" id="register-group-password">
                         <div class="col-sm-4">
-                            <label id="passwordLabel" class="control-label">Password: </label>
+                            <label id="passwordLabel" class="control-label">
+                                Password:
+                                <span class="glyphicon glyphicon-eye-open"
+                                      onclick="tooglePasswordFieldType('#register-password')"
+                                      id="register-password-icon">
+
+                                </span></label>
                         </div>
                         <div class="col-sm-8">
-                            <div class="input-group">
-                                <input style="border-color:red;" id="register-password"
-                                       type="password" value="" class="form-control"
-                                       placeholder="Password" aria-describedby="basic-addon1">
-                                <span id="passwordIcon" title="See password"
-                                      class="btn input-group-addon glyphicon glyphicon-eye-open"></span>
-                            </div>
+                            <input id="register-password"
+                                   type="password" value="" class="form-control"
+                                   placeholder="Password" aria-describedby="basic-addon1">
                         </div>
                     </div>
                     <!-- End -->
                     <br />
                     <br />
                     <!-- Password (2nd check) -->
-                    <div class="form-group">
+                    <div class="form-group has-error" id="register-group-password-check">
                         <div class="col-sm-4">
                             <label id="checkPasswordLabel" class="control-label">Retype
-                                password: </label>
+                                password:
+                                <span class="glyphicon glyphicon-eye-open"
+                                      onclick="tooglePasswordFieldType('#register-password-check')"
+                                      id="register-password-check-icon">
+                                </span> </label>
                         </div>
                         <div class="col-sm-8">
-                            <div class="input-group">
-                                <input style="border-color:red;" id="register-password-check"
-                                       type="password" value="" class="form-control"
-                                       placeholder="Retype your password"
-                                       aria-describedby="basic-addon1">
-                                <span id="checkPasswordIcon" title="See password"
-                                      class="btn input-group-addon glyphicon glyphicon-eye-open"></span>
-                            </div>
+                            <input id="register-password-check"
+                                   type="password" value="" class="form-control"
+                                   placeholder="Retype your password"
+                                   aria-describedby="basic-addon1">
                         </div>
                     </div>
                     <!-- End -->

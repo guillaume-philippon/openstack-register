@@ -8,24 +8,18 @@ function getUserAttributes() {
     $.getJSON(location.pahtname, {format: 'json'}
     ).done(
         function (users) {
-            for ( let user in users ) {
-                $('#usernameInput').val(users[user].uid);
-                $('#emailInput').val(users[user].mail);
-                $('#firstnameInput').val(users[user].firstname);
-                $('#lastnameInput').val(users[user].lastname);
-                $('#fullnameInput').val(users[user].fullname);
-            }
+            $('#username-info').text(users[0].uid);
+            $('#email-info').text(users[0].mail);
+            $('#firstname-info').text(users[0].firstname);
+            $('#lastname-info').text(users[0].lastname);
         }
     );
 }
 
-/* toggle disable value for a specific input id */
-function toggleInput(field) {
-    if ( $('#' + field).prop('disabled')) {
-        $('#' + field).prop('disabled', false);
-    } else {
-        $('#' + field).prop('disabled', true);
-    }
-    $('#btn-save').addClass('btn-danger');
-    $('#btn-save').prop('disabled', false);
+/* Open edit menu for user information */
+function openEditInfoModal() {
+    $('#user-edit-firstname').val($('#firstname-info').text());
+    $('#user-edit-lastname').val($('#lastname-info').text());
+    $('#user-edit-email').val($('#email-info').text());
+    $('#user-edit-modal').modal('show');
 }

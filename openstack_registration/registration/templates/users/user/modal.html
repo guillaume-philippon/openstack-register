@@ -1,0 +1,102 @@
+<div class="modal fade" id="user-edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row form-register">
+
+                    <!-- firstname -->
+                    <div class="form-group"  id="user-edit-group-firstname">
+                        <div class="col-sm-4">
+                            <label id="firstnameLabel"
+                                   class="control-label">Firstname: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <input id="user-edit-firstname" type="text"
+                                   value="" class="form-control" placeholder="Firstname"
+                                   aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <!-- End -->
+                    <br />
+                    <br />
+                    <!-- lastname -->
+                    <div class="form-group" id="user-edit-group-lastname">
+                        <div class="col-sm-4">
+                            <label id="lastnameLabel"
+                                   class="control-label">Lastname: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <input id="user-edit-lastname" type="text"
+                                   value="" class="form-control" placeholder="Lastname"
+                                   aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <!-- End -->
+                    <br />
+                    <br />
+                    <!-- email -->
+                    <div class="form-group"  id="user-edit-group-email">
+                        <div class="col-sm-4">
+                            <label id="emailLabel" class="control-label">Email: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <input id="user-edit-email" type="text"
+                                   value="" class="form-control" placeholder="Email address"
+                                   aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <!-- End -->
+                    <br />
+                    <br />
+                    <!-- Password -->
+                    <div class="form-group has-error has-feedback" id="user-edit-group-password">
+                        <div class="col-sm-4">
+                            <label id="passwordLabel" class="control-label">
+                                Password :
+                                <span class="glyphicon glyphicon-eye-open"
+                                      id="user-edit-password-icon"
+                                      onclick="tooglePasswordFieldType('#user-edit-password')">
+
+                                </span></label>
+                        </div>
+                        <div class="col-sm-8">
+                            <input id="user-edit-password"
+                                   type="password" value="" class="form-control"
+                                   placeholder="Password" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <!-- End -->
+                    <br />
+                    <br />
+                    <!-- Password (2nd check) -->
+                    <div class="form-group has-error has-feedback"  id="user-edit-group-password-check">
+                        <div class="col-sm-4">
+                            <label id="checkPasswordLabel" class="control-label">Retype
+                                password:
+                                <span class="glyphicon glyphicon-eye-open"
+                                      id="user-edit-password-check-icon"
+                                      onclick="tooglePasswordFieldType('#user-edit-password-check')">
+
+                                </span></label>
+                        </div>
+                        <div class="col-sm-8">
+                            <input id="user-edit-password-check"
+                                   type="password" value="" class="form-control"
+                                   placeholder="Retype your password"
+                                   aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <!-- End -->
+                    <br/>
+                    <br/>
+                    <!-- Register button -->
+                    <div class="col-sm-12">
+                        <a class="btn btn-lg btn-primary btn-block disabled"
+                           id="user-edit-btn" onclick="save('{{ csrf_token }}')"
+                           ><span class="glyphicon-save glyphicon"></span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

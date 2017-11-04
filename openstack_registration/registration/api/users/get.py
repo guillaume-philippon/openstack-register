@@ -1,7 +1,6 @@
 """
 Provide view that will be call when a uri:/users request will be call
 """
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import JsonResponse
 
@@ -9,7 +8,7 @@ from registration.decorators import superuser_required
 from registration.Backend import OpenLdap
 
 
-@login_required
+@superuser_required
 def html(request):
     """
     Return the HTML page to display users list

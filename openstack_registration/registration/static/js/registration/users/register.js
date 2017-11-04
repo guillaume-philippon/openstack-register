@@ -6,16 +6,6 @@ var LASTNAME_STATUS = false;
 var AGREEMENT_STATUS = false;
 var EMAIL_STATUS = false;
 
-/* Regexp for mail@example.fr */
-const EMAIL_REGEXP = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-
-/* Test if password have at lease
-    - 1 low char
-    - 1 up char
-    - 1 digit
-*/
-const PASSWORD_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*).{8,}$/;
-
 /* Firstname & lastname must have at least one char */
 const FIRSTNAME_REGEXP = /^.+$/;
 const LASTNAME_REGEXP = /^.+$/;
@@ -31,11 +21,10 @@ function register(csrf) {
         email: $('#register-email').val()
     };
     $.post('/users/' + post_data.username, post_data, function(data){
-        console.log(data)
         if (data.status == 'success') {
-            $(location).attr('href', '/users/' + username)
+            $(location).attr('href', '/users/' + username);
         } else {
-            alert(data.message)
+            alert(data.message);
         }
     });
 }
@@ -48,22 +37,8 @@ function checkRegisterStatus() {
         LASTNAME_STATUS &&
         AGREEMENT_STATUS
     ) {
-//        console.log('All register from status are true');
-//        console.log('USERNAME_STATUS: ' + USERNAME_STATUS);
-//        console.log('PASSWORD_STATUS: ' + PASSWORD_STATUS);
-//        console.log('EMAIL_STATUS: ' + EMAIL_STATUS);
-//        console.log('FIRSTNAME_STATUS: ' + FIRSTNAME_STATUS);
-//        console.log('LASTNAME_STATUS: ' + LASTNAME_STATUS);
-//        console.log('AGREEMENT_STATUS: ' + AGREEMENT_STATUS);
         $('#register-btn').removeClass('disabled');
-    } else { // Else, we disable it
-//        console.log('Some register from status are false');
-//        console.log('USERNAME_STATUS: ' + USERNAME_STATUS);
-//        console.log('PASSWORD_STATUS: ' + PASSWORD_STATUS);
-//        console.log('EMAIL_STATUS: ' + EMAIL_STATUS);
-//        console.log('FIRSTNAME_STATUS: ' + FIRSTNAME_STATUS);
-//        console.log('LASTNAME_STATUS: ' + LASTNAME_STATUS);
-//        console.log('AGREEMENT_STATUS: ' + AGREEMENT_STATUS);
+    } else { /* Else, we disable it */
         if (! $('#register-btn').hasClass('disabled')) {
             $('#register-btn').addClass('disabled');
         }
@@ -76,16 +51,16 @@ function openRegisterModal() {
 }
 
 function checkUsername() {
-    username = $('#register-username').val()
+    username = $('#register-username').val();
     $.getJSON('/users/' + username, function (data){
         if (data.status == 'UserNotExist') {
             USERNAME_STATUS = true;
-            $('#register-username').attr('style', 'border-color:green');
+            changeGroupClass("#register-group-username", "has-success");
         }
     })
     .error(function(data) {
         USERNAME_STATUS = false;
-        $('#register-username').attr('style', 'border-color:red');
+        changeGroupClass("#register-group-username", "has-error");
     });
     checkRegisterStatus();
 }
@@ -95,14 +70,19 @@ function checkPassword() {
     first_password = $('#register-password').val();
     second_password = $('#register-password-check').val();
 
+    /* If the first password match the regexp, so we accept it */
+    if (PASSWORD_REGEXP.test(first_password)) {
+        changeGroupClass("#register-group-password", "has-success");
+    } else {
+        changeGroupClass("#register-group-password", "has-error");
+    }
+
     /* test if passwords are the same & if it match REGEXP */
     if (first_password == second_password && PASSWORD_REGEXP.test(first_password)) {
-        $("#register-password").attr('style', 'border-color:green;')
-        $("#register-password-check").attr('style', 'border-color:green;')
+        changeGroupClass("#register-group-password-check", "has-success");
         PASSWORD_STATUS = true;
     } else {
-        $("#register-password").attr('style', 'border-color:red;')
-        $("#register-password-check").attr('style', 'border-color:red;')
+        changeGroupClass("#register-group-password-check", "has-error");
         PASSWORD_STATUS = false;
     }
     checkRegisterStatus();
@@ -112,10 +92,10 @@ function checkEmail() {
     email = $('#register-email').val();
     if (EMAIL_REGEXP.test(email)) {
         EMAIL_STATUS = true;
-        $("#register-email").attr('style', 'border-color:green;')
+        changeGroupClass("#register-group-email", "has-success");
     } else {
         EMAIL_STATUS = false;
-        $("#register-email").attr('style', 'border-color:red;')
+        changeGroupClass("#register-group-email", "has-error");
     }
     checkRegisterStatus();
 }
@@ -124,10 +104,10 @@ function checkFirstName() {
     firstname = $('#register-firstname').val();
     if (FIRSTNAME_REGEXP.test(firstname)) {
         FIRSTNAME_STATUS = true;
-        $("#register-firstname").attr('style', 'border-color:green;')
+        changeGroupClass("#register-group-firstname", "has-success");
     } else {
         FIRSTNAME_STATUS = false;
-        $("#register-firstname").attr('style', 'border-color:red;')
+        changeGroupClass("#register-group-firstname", "has-error");
     }
     checkRegisterStatus();
 }
@@ -136,27 +116,20 @@ function checkLastName() {
     lastname = $('#register-lastname').val();
     if (LASTNAME_REGEXP.test(lastname)) {
         LASTNAME_STATUS = true;
-        $("#register-lastname").attr('style', 'border-color:green;')
+        changeGroupClass("#register-group-lastname", "has-success");
     } else {
         LASTNAME_STATUS = false;
-        $("#register-lastname").attr('style', 'border-color:red;')
+        changeGroupClass("#register-group-lastname", "has-error");
     }
-    checkRegisterStatus()
+    checkRegisterStatus();
 }
 
 function checkAgreement() {
     agreement = $('#register-agreement').is(':checked');
-    console.log(agreement)
     if (agreement) {
         AGREEMENT_STATUS = true;
     } else {
         AGREEMENT_STATUS = false;
     }
     checkRegisterStatus();
-}
-
-/* Check email validity*/
-function isEmail(email) {
-  var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-  return regex.test(email);
 }
