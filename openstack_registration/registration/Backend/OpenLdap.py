@@ -6,16 +6,15 @@ OpenLdap backend support
 import ldap
 import ldap.sasl
 
-from registration.Backend.PrototypeBackend import PrototypeBackend
 from registration.utils import encode_password
-from registration.exceptions import InvalidX500DN  # pylint: disable=ungrouped-imports
+from registration.exceptions import InvalidX500DN
 from registration.models import UserActivation
 
 from openstack_registration.config import GLOBAL_CONFIG
 
 
 # TODO: Should be named OpenLdapBackend to avoid miss-lead
-class OpenLdap(PrototypeBackend):
+class OpenLdap(object):
     """
     OpenLdap Backend support is based on PrototypeBackend
     """
@@ -75,43 +74,6 @@ class OpenLdap(PrototypeBackend):
         except:  # pylint: disable=bare-except
             print "Error while adding user " + dn_user + " from group " + dn_group
         return ok
-
-    def add_user(self, username, email, firstname, lastname, x500dn, password):  # pylint: disable=too-many-arguments
-        """
-        Create a new user this its attributes
-        :param username: username of new user
-        :param email: email of the user
-        :param firstname: first name of the user
-        :param lastname: last name of the user
-        :param x500dn: DN certificate
-        :param password: password
-        :return: void
-        """
-        attributes = []
-        # TODO: ou base should be used from GLOBAL_CONFIG
-        dn_user = "uid={},ou=users,o=cloud".format(username)
-        attrs = {
-            'objectClass': ['organizationalPerson', 'person', 'inetOrgPerson', 'top'],
-            'uid': username,
-            'mail': email,
-            'givenName': firstname,
-            'sn': lastname,
-            'cn': "{} {}".format(firstname, lastname),
-            'userPassword': str(password),
-            'pager': '514',
-            'seeAlso': str(x500dn)
-        }
-
-        for value in attrs:
-            entry = (value, attrs[value])
-            attributes.append(entry)
-
-        try:
-            self.connection.add_s(dn_user, attributes)
-        except ldap.INVALID_SYNTAX:  # pylint: disable=no-member
-            raise InvalidX500DN('')
-        except:  # pylint: disable=bare-except
-            exit(1)
 
     # TODO: addGroup should be renamed
     def addGroup(self, group, desc, user): # pylint: disable=invalid-name
@@ -204,7 +166,7 @@ class OpenLdap(PrototypeBackend):
                                         .format(uid),
                                         ['uniqueMember', 'cn', 'description'])
 
-    def modify_user(self, uid, action):
+    def modify_user_old(self, uid, action):
         """
         Modify user entry
         :param uid: uid
@@ -318,6 +280,30 @@ class OpenLdap(PrototypeBackend):
         for _, attributes in users:
             response.append(self._ldap_to_dict(attributes))
         return response
+
+    def modify_user(self, username, attributes):
+        """
+        Modify a user attributes
+
+        :param attributes: attributes
+        :return: void
+        """
+        user = 'uid={username},{base_ou}'.format(username=username,
+                                                 base_ou=GLOBAL_CONFIG['LDAP_BASE_OU'])
+        ldif = list()
+        for attribute in attributes:
+            if attribute == 'email':
+                ldif.append((ldap.MOD_REPLACE, 'mail', str(attributes[attribute])))  # pylint: disable=no-member
+            elif attribute == 'firstname':
+                ldif.append((ldap.MOD_REPLACE, 'givenName', str(attributes[attribute])))  # pylint: disable=no-member
+            elif attribute == 'lastname':
+                ldif.append((ldap.MOD_REPLACE, 'sn', str(attributes[attribute])))  # pylint: disable=no-member
+            elif attribute == 'password':
+                if attributes[attribute] != "":
+                    password = str(encode_password(unicode(attributes[attribute])
+                                                   .encode(encoding='utf-8')))
+                    ldif.append((ldap.MOD_REPLACE, 'userPassword', password))  # pylint: disable=no-member
+        self.connection.modify_s(user, ldif)
 
     @staticmethod
     def _ldap_to_dict(attributes):

@@ -32,6 +32,8 @@ function changeGroupClass(group, addClass) {
     if ($(group).hasClass(removeClass)) {
         $(group).removeClass(removeClass);
         $(group).addClass(addClass);
+    } else {
+        $(group).addClass(addClass);
     }
 }
 

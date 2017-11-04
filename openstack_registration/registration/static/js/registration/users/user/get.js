@@ -15,11 +15,3 @@ function getUserAttributes() {
         }
     );
 }
-
-/* Open edit menu for user information */
-function openEditInfoModal() {
-    $('#user-edit-firstname').val($('#firstname-info').text());
-    $('#user-edit-lastname').val($('#lastname-info').text());
-    $('#user-edit-email').val($('#email-info').text());
-    $('#user-edit-modal').modal('show');
-}
