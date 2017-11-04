@@ -2,6 +2,7 @@
 Provide RESTful API for uri://users/*username* request
 """
 from registration.api.users.user import get as user_get
+from registration.api.users.user import post as user_post
 
 
 def dispatcher(request, username):
@@ -23,4 +24,6 @@ def dispatcher(request, username):
             response = user_get.json(request, username=username)
         else:
             response = user_get.html(request, username=username)
+    elif request.method == "POST":
+        response = user_post.json(request, username=username)
     return response

@@ -27,8 +27,8 @@ urlpatterns = [  # pylint: disable=invalid-name
 
     # users view
     url(r'^users[/]?$', api.users.dispatcher),
-    url(r'^users/(?P<username>[\w]+)$', api.users.dispatcher),
-    url(r'^users/(?P<username>[\w]+)/(?P<attributes>[\w]+)$', api.users.dispatcher),
+    url(r'^users/(?P<username>[\w\.\-_]+)$', api.users.dispatcher),
+    url(r'^users/(?P<username>[\w\.\-_]+)/(?P<attributes>[\w]+)$', api.users.dispatcher),
 
     # Administration view
     # url(r'^admin/$', views.admin_dispatcher),

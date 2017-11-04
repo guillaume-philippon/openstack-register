@@ -2,7 +2,14 @@
 {% load i18n %}
 {% block title %}OpenStack - Home{% endblock %}
 
+{% block script %}
+<script src="/static/js/registration/login.js" type="text/javascript"></script>
+<script src="/static/js/registration/users/register.js" type="text/javascript"></script>
+
+{% endblock %}
+
 {% block javascript %}
+{% include "scripts/home.js" %}
 {% endblock %}
 
 {% block head %}
@@ -10,9 +17,8 @@
     <h1>Registration</h1>
     <p>The LAL cloud infrastructure lets users and application developpers try out their softwares
         without having to install and manage their own cloud.</p>
-    <a href="/users/_create">
-        <button id="register" type="button" class="btn btn-primary ">REGISTER
-            <span class="glyphicon glyphicon-arrow-right"></span></button>
+    <a href="#" onclick="openRegisterModal()"  class="btn btn-primary">
+        REGISTER <span class="glyphicon glyphicon-arrow-right"></span>
     </a>
 </div>
 {% endblock %}
@@ -24,7 +30,8 @@
         documentation</a> and
         <a href="/policies">policies</a>
     </li>
-    <li><strong>New user?</strong> <a href="/users/_create">Register</a> for an account.</li>
+    <li><strong>New user?</strong> <a href="#" onclick="openRegisterModal()">
+                                    Register</a> for an account.</li>
     <li><strong>Existing user?</strong> Update your <a href="#"
                                                        data-toggle="modal"
                                                        data-target="#login-modal">profile</a>.</li>
@@ -35,4 +42,9 @@
 <p>Please visit <a href="https://openstack.lal.in2p3.fr/tutoriel/tutorial/" target="_blank">
     the documentation page</a> or <a href="https://cloud-support.lal.in2p3.fr" target="_blank">
     contact us</a> </p>
+{% endblock %}
+
+{% block modal %}
+{% include "login/modal.html" %}
+{% include "register/modal.html" %}
 {% endblock %}

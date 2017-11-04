@@ -21,7 +21,9 @@ def html(request, username):
 
     # If the response is empty, then when want to create a new user. So we load register page
     if not user:
-        response = render(request, 'users/register.html')
+        response = JsonResponse({
+            'status': 'UserNotExist'
+        })
     # else, we display the user information form.
     else:
         response = user_information_html(request, username=username)

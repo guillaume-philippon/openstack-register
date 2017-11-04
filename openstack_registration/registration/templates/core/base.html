@@ -18,13 +18,10 @@
 
     <body>
 {% include "core/scripts.html" %}
+
 {% block script %} {% endblock %}
 <script>
-{% block javascript %}
-
-{% include "login/scripts.js" %}
-
-{% endblock %}
+{% block javascript %}{% endblock %}
 </script>
 
 
@@ -46,7 +43,8 @@
 </div>
 
 <!-- Include login modal -->
-{% include "login/modal.html" %}
+{% block modal %}
+{% endblock %}
 
 
     </body>

@@ -23,4 +23,4 @@ API method supported:
 - **DELETE**: delete a entry
 
 """
-from registration.api import users, register
+from registration.api import users

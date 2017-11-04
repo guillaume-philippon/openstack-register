@@ -5,7 +5,7 @@ on REST good practice.
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, QueryDict
+from django.http import JsonResponse, QueryDict, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 
@@ -768,11 +768,17 @@ def user_get_json(request, spec=None):  #pylint: disable=too-many-branches, too-
 
 def home(request):
     """
-    make desc.
+    Default home page for openstack-registration. If user is already logged, we redirect him to
+    it's own interface.
+
     :param request: Web request
-    :return: void
+    :return: HTTP rendering
     """
-    return render(request, 'home/get.html')
+    if request.user.is_authenticated():
+        response = HttpResponseRedirect('/users/{}'.format(request.user.get_username()))
+    else:
+        response = render(request, 'home.html')
+    return response
 
 
 @login_required()

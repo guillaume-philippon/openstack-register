@@ -1,3 +1,8 @@
 body {
   padding-top: 70px;
 }
+
+.form-register {
+  padding: 15px;
+  margin: 0 auto;
+}

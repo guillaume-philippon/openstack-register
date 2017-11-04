@@ -7,11 +7,11 @@ import ldap
 import ldap.sasl
 
 from registration.Backend.PrototypeBackend import PrototypeBackend
-
-from openstack_registration.config import GLOBAL_CONFIG
-
+from registration.utils import encode_password
 from registration.exceptions import InvalidX500DN  # pylint: disable=ungrouped-imports
 from registration.models import UserActivation
+
+from openstack_registration.config import GLOBAL_CONFIG
 
 
 # TODO: Should be named OpenLdapBackend to avoid miss-lead
@@ -270,6 +270,37 @@ class OpenLdap(PrototypeBackend):
         except:  # pylint: disable=bare-except
             attrs['status'] = 'fail'
         return attrs
+
+    def create_user(self, attributes):
+        """
+        Create a ldap user with all their attributes
+
+        :param attributes: User attributes in dict. format
+        :return: void
+        """
+        user = "uid={username},{base_ou}".format(username=attributes['username'],
+                                                 base_ou=GLOBAL_CONFIG['LDAP_BASE_OU'])
+        # We generate the "ldif-like" entry. ldap module need to have a specific format, entries
+        # must be give as a list of tuple and value must always be a list.
+        # We also need to for str for attributes as there are some strange unicode issue.
+        # We also need to encode the password.
+        # TODO: Make ajax request must give a encoded password, we should not have the plain one.
+        user_attributes = [
+            ('objectClass', ['organizationalPerson', 'person', 'inetOrgPerson', 'top']),
+            ('uid', [str(attributes['username'])]),
+            ('mail', [str(attributes['email'])]),
+            ('givenName', [str(attributes['firstname'])]),
+            ('sn', [str(attributes['lastname'])]),
+            ('cn', [str("{} {}".format(attributes['firstname'],
+                                       attributes['lastname']))]),
+            ('userPassword', [str(encode_password(unicode(attributes['password'])
+                                                  .encode(encoding='utf-8')))]),
+            ('pager', ['514'])
+        ]
+        try:
+            self.connection.add_s(user, user_attributes)
+        except ldap.INVALID_SYNTAX:  # pylint: disable=no-member
+            raise InvalidX500DN('')
 
     def get(self, username='*'):
         """
