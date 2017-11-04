@@ -85,28 +85,31 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="row form-register">
+                    <div class="well well-lg">
+                        <h4 class="text-center">You will update your password. Retype the new password to confirm</h4>
+                        <br/>
+                        <br/>
+                        <!-- Password -->
+                        <div class="form-group has-error has-feedback" id="user-edit-password-check-group">
+                            <div class="col-sm-4">
+                                <label id="passwordCheckLabel" class="control-label">
+                                    Password :
+                                    <span class="glyphicon glyphicon-eye-open"
+                                          id="user-edit-password-check-icon"
+                                          onclick="tooglePasswordFieldType('#user-edit-password-check')">
 
-                    You will update your password. Retype the new password to confirm
-                    <!-- Password -->
-                    <div class="form-group has-error has-feedback" id="user-edit-password-check-group">
-                        <div class="col-sm-4">
-                            <label id="passwordCheckLabel" class="control-label">
-                                Password :
-                                <span class="glyphicon glyphicon-eye-open"
-                                      id="user-edit-password-check-icon"
-                                      onclick="tooglePasswordFieldType('#user-edit-password-check')">
-
-                                </span></label>
+                                    </span></label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input id="user-edit-password-check"
+                                       type="password" value="" class="form-control"
+                                       placeholder="Password" aria-describedby="basic-addon1">
+                            </div>
                         </div>
-                        <div class="col-sm-8">
-                            <input id="user-edit-password-check"
-                                   type="password" value="" class="form-control"
-                                   placeholder="Password" aria-describedby="basic-addon1">
-                        </div>
+                        <br/>
+                        <br/>
                     </div>
                     <!-- End -->
-                    <br/>
-                    <br/>
                     <!-- Register button -->
                     <div class="col-sm-12">
                         <a class="btn btn-lg btn-primary btn-block disabled"

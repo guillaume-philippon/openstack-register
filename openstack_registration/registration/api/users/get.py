@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 
 from registration.decorators import superuser_required
-from registration.Backend import OpenLdap
+from registration.Backend import OpenLdapUserBackend
 
 
 @superuser_required
@@ -29,5 +29,5 @@ def json(request):  # pylint: disable=unused-argument
     :param request: Web request
     :return: JSonResponse
     """
-    ldap = OpenLdap()
+    ldap = OpenLdapUserBackend()
     return JsonResponse(ldap.get(), safe=None)

@@ -32,16 +32,24 @@
           <div class="col-sm-6">
               <strong>Email Adress</strong>: <span id="email-info"></span>
           </div>
-          <div class="col-sm-6">
-              <a class="btn btn-primary col-sm-4" onclick="openEditInfoModal()">
-                  <span class="glyphicon glyphicon-edit"></span>
-              </a>
+          <div class="col-sm-6 row">
+              <div class="col-sm-6">
+                  <a class="btn btn-primary col-sm-12" onclick="openEditInfoModal()">
+                      <span class="glyphicon glyphicon-edit"></span>
+                  </a>
+              </div>
+              <div class="col-sm-6">
+                  <a class="btn btn-danger col-sm-12" onclick="openDeleteModal()">
+                      <span class="glyphicon glyphicon-trash"></span>
+                  </a>
+              </div>
           </div>
       </div>
   </div>
 </div>
 
 {% include "users/user/modify.html" %}
+{% include "users/user/delete.html" %}
 
 {% endblock %}
 
