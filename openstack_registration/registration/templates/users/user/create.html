@@ -5,7 +5,7 @@
                 <div class="row form-register">
 
                     <!-- Username -->
-                    <div class="form-group has-error" id="register-group-username">
+                    <div class="form-group has-error" id="register-username-group">
                         <div class="col-sm-4">
                             <label id="usernameLabel" class="control-label">Username: </label>
                         </div>
@@ -19,7 +19,7 @@
                     <br />
                     <br />
                     <!-- email -->
-                    <div class="form-group has-error" id="register-group-email">
+                    <div class="form-group has-error" id="register-email-group">
                         <div class="col-sm-4">
                             <label id="emailLabel" class="control-label">Email: </label>
                         </div>
@@ -33,7 +33,7 @@
                     <br />
                     <br />
                     <!-- firstname -->
-                    <div class="form-group has-error" id="register-group-firstname">
+                    <div class="form-group has-error" id="register-firstname-group">
                         <div class="col-sm-4">
                             <label id="firstnameLabel"
                                    class="control-label">Firstname: </label>
@@ -48,7 +48,7 @@
                     <br />
                     <br />
                     <!-- lastname -->
-                    <div class="form-group has-error" id="register-group-lastname">
+                    <div class="form-group has-error" id="register-lastname-group">
                         <div class="col-sm-4">
                             <label id="lastnameLabel"
                                    class="control-label">Lastname: </label>
@@ -63,7 +63,7 @@
                     <br />
                     <br />
                     <!-- Project -->
-                    <div class="form-group" id="register-group-project">
+                    <div class="form-group" id="register-project-group">
                         <div class="col-sm-4">
                             <label id="projectLabel" class="control-label">Project
                                 (optional): </label>
@@ -78,12 +78,12 @@
                     <br />
                     <br />
                     <!-- Password -->
-                    <div class="form-group has-error" id="register-group-password">
+                    <div class="form-group has-error" id="register-password-group">
                         <div class="col-sm-4">
                             <label id="passwordLabel" class="control-label">
                                 Password:
                                 <span class="glyphicon glyphicon-eye-open"
-                                      onclick="tooglePasswordFieldType('#register-password')"
+                                      onclick="password.tooglePasswordVisible(false)"
                                       id="register-password-icon">
 
                                 </span></label>
@@ -98,12 +98,12 @@
                     <br />
                     <br />
                     <!-- Password (2nd check) -->
-                    <div class="form-group has-error" id="register-group-password-check">
+                    <div class="form-group has-error" id="register-password-check-group">
                         <div class="col-sm-4">
                             <label id="checkPasswordLabel" class="control-label">Retype
                                 password:
                                 <span class="glyphicon glyphicon-eye-open"
-                                      onclick="tooglePasswordFieldType('#register-password-check')"
+                                      onclick="password.tooglePasswordVisible(true)"
                                       id="register-password-check-icon">
                                 </span> </label>
                         </div>
@@ -134,7 +134,7 @@
                     <!-- Register button -->
                     <div class="col-sm-12">
                         <a class="btn btn-lg btn-primary btn-block disabled"
-                           id="register-btn" onclick="register('{{ csrf_token }}')"
+                           id="register-btn" onclick="create_button.create('{{ csrf_token }}')"
                            >Register</a>
                     </div>
                 </div>

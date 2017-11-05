@@ -12,6 +12,12 @@ from registration.models import UserActivation
 
 from openstack_registration.config import GLOBAL_CONFIG
 
+ATTRIBUTE_BINDING = {
+    'email': 'mail',
+    'firstname': 'givenName',
+    'lastname': 'sn',
+    'password': 'userPassword'
+}
 
 # TODO: Should be named OpenLdapBackend to avoid miss-lead
 class OpenLdap(object):
@@ -166,7 +172,7 @@ class OpenLdap(object):
                                         .format(uid),
                                         ['uniqueMember', 'cn', 'description'])
 
-    def modify_user_old(self, uid, action):
+    def modify_user(self, uid, action):
         """
         Modify user entry
         :param uid: uid
@@ -311,6 +317,7 @@ class OpenLdapUserBackend(OpenLdapBackend):
         """
         Modify a user attributes
 
+        :param username: username will modify
         :param attributes: attributes
         :return: void
         """
