@@ -1,17 +1,15 @@
-class CheckField {
+class CheckField extends StandardField {
     constructor(field) {
+        super(field);
         this.field = field;
     }
 
     validate() {
-        var value = $(this.field).is(':checked')
+        var value = $(this.field).is(':checked');
         if (value) {
             return true;
         } else {
             return false;
         }
-    }
-    get() {
-        return $(this.field).val();
     }
 }

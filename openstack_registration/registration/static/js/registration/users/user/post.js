@@ -18,9 +18,10 @@ $(function(){
         'lastname': lastname,
         'firstname': firstname,
         'agreement': agreement
-    }
+    };
 
-    create_button = new SaveButton('#register-btn', mandatory_options, '/users/', 'username');
+    create_button = new SaveButton('#register-btn', mandatory_options,
+                                   '/users/');
 
     /* load action on focusout */
     $('#register-username').focusout(function () {

@@ -134,7 +134,8 @@
                     <!-- Register button -->
                     <div class="col-sm-12">
                         <a class="btn btn-lg btn-primary btn-block disabled"
-                           id="register-btn" onclick="create_button.create('{{ csrf_token }}')"
+                           id="register-btn"
+                           onclick="create_button.create('{{ csrf_token }}', $('#register-username').val())"
                            >Register</a>
                     </div>
                 </div>

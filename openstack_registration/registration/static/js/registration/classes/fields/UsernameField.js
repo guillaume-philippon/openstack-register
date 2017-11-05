@@ -1,8 +1,8 @@
-class UsernameField {
+class UsernameField extends StandardField {
     constructor (field) {
+        super(field);
         this.field = field;
-        this.group_suffix = '-group';
-        this.uri_prefix = '/users/'
+        this.uri_prefix = '/users/';
     }
 
     validate() {
@@ -23,14 +23,9 @@ class UsernameField {
             }
         })
         .error(function(data) {
-            console.log('error')
             $(group_field_name).addClass('has-error');
             $(group_field_name).removeClass('has-success');
             return false;
         });
-    }
-
-    get() {
-        return $(this.field).val();
     }
 }

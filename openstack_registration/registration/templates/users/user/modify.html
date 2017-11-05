@@ -5,7 +5,7 @@
                 <div class="row form-register">
 
                     <!-- firstname -->
-                    <div class="form-group">
+                    <div class="form-group has-success" id="user-edit-firstname-group">
                         <div class="col-sm-4">
                             <label id="firstnameLabel"
                                    class="control-label">Firstname: </label>
@@ -20,7 +20,7 @@
                     <br />
                     <br />
                     <!-- lastname -->
-                    <div class="form-group">
+                    <div class="form-group has-success" id="user-edit-lastname-group">
                         <div class="col-sm-4">
                             <label id="lastnameLabel"
                                    class="control-label">Lastname: </label>
@@ -35,7 +35,7 @@
                     <br />
                     <br />
                     <!-- email -->
-                    <div class="form-group has-success" id="user-edit-group-email">
+                    <div class="form-group has-success" id="user-edit-email-group">
                         <div class="col-sm-4">
                             <label id="emailLabel" class="control-label">Email: </label>
                         </div>
@@ -49,30 +49,36 @@
                     <br />
                     <br />
                     <!-- Password -->
-                    <div class="form-group" id="user-edit-password-group">
-                        <div class="col-sm-4">
-                            <label id="passwordLabel" class="control-label">
-                                Password :
-                                <span class="glyphicon glyphicon-eye-open"
-                                      id="user-edit-password-icon"
-                                      onclick="tooglePasswordFieldType('#user-edit-password')">
+                    <!--<div class="form-group" id="user-edit-password-group">-->
+                        <!--<div class="col-sm-4">-->
+                            <!--<label id="passwordLabel" class="control-label">-->
+                                <!--Password :-->
+                                <!--<span class="glyphicon glyphicon-eye-open"-->
+                                      <!--id="user-edit-password-icon"-->
+                                      <!--onclick="tooglePasswordFieldType('#user-edit-password')">-->
 
-                                </span></label>
-                        </div>
-                        <div class="col-sm-8">
-                            <input id="user-edit-password"
-                                   type="password" value="" class="form-control"
-                                   placeholder="Password" aria-describedby="basic-addon1">
-                        </div>
-                    </div>
-                    <!-- End -->
-                    <br/>
-                    <br/>
+                                <!--</span></label>-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-8">-->
+                            <!--<input id="user-edit-password"-->
+                                   <!--type="password" value="" class="form-control"-->
+                                   <!--placeholder="Password" aria-describedby="basic-addon1">-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--&lt;!&ndash; End &ndash;&gt;-->
+                    <!--<br/>-->
+                    <!--<br/>-->
                     <!-- Register button -->
-                    <div class="col-sm-12">
+                    <div class="col-sm-6">
                         <a class="btn btn-lg btn-primary btn-block"
-                           id="user-edit-btn" onclick="updateUserInformations('{{ csrf_token }}')"
+                           id="user-edit-btn"
+                           onclick="modifyUser('{{ csrf_token }}')"
                            ><span class="glyphicon-save glyphicon"></span></a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a class="btn btn-lg btn-danger btn-block"
+                           onclick="$('#user-edit-password-modal').modal('show')"
+                           >Change Password</a>
                     </div>
                 </div>
             </div>
@@ -80,7 +86,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="user-edit-password-check-modal" tabindex="-2" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="user-edit-password-modal" tabindex="-2" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-body">
@@ -90,13 +96,33 @@
                         <br/>
                         <br/>
                         <!-- Password -->
+                        <div class="form-group has-error has-feedback" id="user-edit-password-group">
+                            <div class="col-sm-4">
+                                <label id="passwordLabel" class="control-label">
+                                    Password :
+                                    <span class="glyphicon glyphicon-eye-open"
+                                          id="user-edit-password-icon"
+                                          onclick="password.tooglePasswordVisible(false)">
+
+                                    </span></label>
+                            </div>
+                            <div class="col-sm-8">
+                                <input id="user-edit-password"
+                                       type="password" value="" class="form-control"
+                                       placeholder="Password" aria-describedby="basic-addon1">
+                            </div>
+                        </div>
+                        <!-- End -->
+                        <br/>
+                        <br/>
+                        <!-- Password -->
                         <div class="form-group has-error has-feedback" id="user-edit-password-check-group">
                             <div class="col-sm-4">
                                 <label id="passwordCheckLabel" class="control-label">
                                     Password :
                                     <span class="glyphicon glyphicon-eye-open"
                                           id="user-edit-password-check-icon"
-                                          onclick="tooglePasswordFieldType('#user-edit-password-check')">
+                                          onclick="password.tooglePasswordVisible(true)">
 
                                     </span></label>
                             </div>
@@ -113,7 +139,7 @@
                     <!-- Register button -->
                     <div class="col-sm-12">
                         <a class="btn btn-lg btn-primary btn-block disabled"
-                           id="user-edit-password-check-btn" onclick="updateUserInformations('{{ csrf_token }}')"
+                           id="user-edit-password-btn" onclick="modifyUserPassword('{{ csrf_token }}')"
                            >Confirm New Password</a>
                     </div>
                 </div>

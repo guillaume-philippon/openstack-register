@@ -38,5 +38,5 @@ function openEditModal(username) {
 //    $('#user-edit-firstname').val(row.firstname);
 //    $('#user-edit-lastname').val(row.lastname);
 //    $('#user-edit-email').val(row.mail);
-    $('#user-edit-modal').modal('show')
+    $('#user-edit-modal').modal('show');
 }

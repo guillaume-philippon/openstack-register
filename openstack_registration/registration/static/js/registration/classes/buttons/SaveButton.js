@@ -1,10 +1,8 @@
 class SaveButton {
-    constructor(field, options, uri, uri_selector) {
+    constructor(field, options, uri) {
         this.field = field;
         this.options = options;
         this.uri = uri; // Base uri for creation (/users/ per-example)
-        this.uri_selector = uri_selector; // options field to add to the uri for
-                                          // creation ('username')
     }
 
     validate() {
@@ -15,7 +13,7 @@ class SaveButton {
         for (let option in opts) {
             /* If field is not valid or previous field is not valid, then we change valid state
              to false */
-            var field_class = opts[option]
+            var field_class = opts[option];
             if (! (field_class.validate() && valid)) {
                 valid = false;
             }
@@ -25,13 +23,13 @@ class SaveButton {
         if (valid) {
             $(this.field).removeClass('disabled');
         } else { // Else, we ensure that it is disabled
-            $(this.field).addClass('disabled')
+            $(this.field).addClass('disabled');
         }
     }
 
-    create(csrf) {
+    create(csrf, username) {
         var opts = this.options; // local name for options
-        var local_uri = this.uri + opts[this.uri_selector].get(); // Build uri (/users/*username*)
+        var local_uri = this.uri + username; // Build uri (/users/*username*)
         var post_data = {
             csrfmiddlewaretoken: csrf,
         };
@@ -39,8 +37,9 @@ class SaveButton {
         for (let option in opts) {
             post_data[option] = opts[option].get();
         }
+
         /* Ajax request for creation */
-        $.post(local_uri, post_data, function(data){
+        return $.post(local_uri, post_data, function(data){
             /* If user created, so we redirect to user information page */
             if (data.status == 'success') {
                 $(location).attr('href', local_uri);
@@ -49,4 +48,28 @@ class SaveButton {
             }
         });
     }
+
+    modify(csrf, username){
+        var opts = this.options; // local name for options
+        var local_uri = this.uri + username; // Build uri (/users/*username*)
+        var put_data = {};
+
+        /* Prepare ajax request */
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrf);
+            }
+        });
+
+        /* Prepare send data */
+        for (let option in opts) {
+            put_data[option] = opts[option].get();
+        }
+
+        return $.ajax({
+            url: local_uri,
+            type: 'PUT',
+            data: JSON.stringify(put_data)
+        });
+   }
 }
