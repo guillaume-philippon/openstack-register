@@ -19,12 +19,14 @@
     </div>
 
     <div class="panel-body">
-        <table id="table-members" class="display" width="100%">
+        <table id="table-members" class="display table-striped" width="100%">
             <!-- table header -->
             <thead>
                 <tr>
-                    <th></th>
+                    <th>Actions</th>
                     <th>User</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
                     <th>Email</th>
                 </tr>
             </thead>
@@ -35,6 +37,6 @@
     </div>
 </div>
 
-{% include "users/admin_modal_password.html" %}
+{% include "users/user/modify.html" %}
 
 {% endblock %}

@@ -1,3 +1,4 @@
+
 /* function to get all users information and populate datable */
 function getUsers() {
     $("#table-members").DataTable( {
@@ -7,21 +8,35 @@ function getUsers() {
                 'format': 'json',
             },
             dataSrc: function (users) {
-                $.each(users, function(uid, attributes){
-                    attributes.icon = '<span class="glyphicon glyphicon-pencil"></span>';
-                    attributes.action = 'Actions';
-                });
                 return users;
             },
         },
         columns: [
-            { data: 'icon'},
-            { data: 'uid'},
+            {
+                data: 'uid',
+                render: function(data, type, row){
+                    return '<p><a href="#" class="btn" onclick="openEditModal(\'' +
+                            data + '\')"><span class="glyphicon ' +
+                            'glyphicon-pencil"></span></a></p>';
+                },
+                width: "50px"
+            },
+            { data: 'uid' },
+            { data: 'firstname'},
+            { data: 'lastname'},
             { data: 'mail'},
         ],
+//        rowHeight": 'auto',
 //        order: [[ 0, 'desc' ]],
 //        iDisplayLength: 10,
 //        stateSave: true,
 //        lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "ALL"] ],
     });
+}
+
+function openEditModal(username) {
+//    $('#user-edit-firstname').val(row.firstname);
+//    $('#user-edit-lastname').val(row.lastname);
+//    $('#user-edit-email').val(row.mail);
+    $('#user-edit-modal').modal('show')
 }
