@@ -6,4 +6,7 @@ $(document).ready(function() {
     $('#user-edit-password-check').focusout(function () {
         checkDualPassword();
     });
+    $('#user-edit-email').focusout(function (){
+        checkEmail();
+    });
 });

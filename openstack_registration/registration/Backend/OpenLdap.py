@@ -14,7 +14,7 @@ from openstack_registration.config import GLOBAL_CONFIG
 
 
 # TODO: Should be named OpenLdapBackend to avoid miss-lead
-class OpenLdap():
+class OpenLdap(object):
     """
     OpenLdap Backend support is based on PrototypeBackend
     """
@@ -234,7 +234,7 @@ class OpenLdap():
         return attrs
 
 
-class OpenLdapBackend(object):
+class OpenLdapBackend(object):  # pylint: disable=too-few-public-methods
     """
     Provide commun tools for OpenLDAP backend support.
     """
@@ -330,6 +330,17 @@ class OpenLdapUserBackend(OpenLdapBackend):
                                                    .encode(encoding='utf-8')))
                     ldif.append((ldap.MOD_REPLACE, 'userPassword', password))  # pylint: disable=no-member
         self.connection.modify_s(user, ldif)
+
+    def delete(self, username):
+        """
+        Delete user account
+
+        :param username: username
+        :return: void
+        """
+        user = 'uid={username},{base_ou}'.format(username=username,
+                                                 base_ou=GLOBAL_CONFIG['LDAP_BASE_OU'])
+        self.connection.delete_s(user)
 
     @staticmethod
     def _ldap_to_dict(attributes):

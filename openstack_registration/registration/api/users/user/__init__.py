@@ -4,7 +4,7 @@ Provide RESTful API for uri://users/*username* request
 from registration.api.users.user import get as user_get
 from registration.api.users.user import post as user_post
 from registration.api.users.user import put as user_put
-
+from registration.api.users.user import delete as user_delete
 
 def dispatcher(request, username):
     """
@@ -29,4 +29,6 @@ def dispatcher(request, username):
         response = user_post.json(request, username=username)
     elif request.method == "PUT":
         response = user_put.json(request, username=username)
+    elif request.method == "DELETE":
+        response = user_delete.json(request, username=username)
     return response
