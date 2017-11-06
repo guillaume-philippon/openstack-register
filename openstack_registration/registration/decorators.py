@@ -56,7 +56,7 @@ def superuser_required(view):
         :param kwargs: package view function arguments as a dict
         :return: function
         """
-        if request.user.is_superuser or request.user.get_username() == GLOBAL_CONFIG['ADMIN_UID']:
+        if request.user.is_superuser:
             return view(request, *args, **kwargs)
         else:
             raise PermissionDenied

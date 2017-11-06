@@ -1,0 +1,31 @@
+<div class="modal fade" id="create-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row form-register">
+                    <!-- Username -->
+                    <div class="form-group has-error" id="create-name-group">
+                        <div class="col-sm-4">
+                            <label id="usernameLabel" class="control-label">Name: </label>
+                        </div>
+                        <div class="col-sm-8">
+                            <input id="create-name" type="text"
+                                   value="" class="form-control" placeholder="Username"
+                                   aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <!-- End username -->
+                    <br />
+                    <br />
+                    <!-- Register button -->
+                    <div class="col-sm-12">
+                        <a class="btn btn-lg btn-primary btn-block disabled"
+                           id="create-btn"
+                           onclick="create_button.create('{{ csrf_token }}', $('#create-name').val())"
+                           >Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

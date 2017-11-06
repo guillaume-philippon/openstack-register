@@ -17,5 +17,5 @@ from django.conf.urls import url, include
 
 urlpatterns = [  # pylint: disable=invalid-name
     url(r'^', include('registration.urls')),
-    url("", include('django_socketio.urls')),
+    # url("", include('django_socketio.urls')),
 ]

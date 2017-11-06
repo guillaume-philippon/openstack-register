@@ -43,7 +43,8 @@ AUTH_OPTIONS = {
     'LDAP_SERVER': 'server',
     'LDAP_USER': 'bind_dn',
     'LDAP_PASSWORD': 'password',
-    'LDAP_BASE_OU': 'user_search'
+    'LDAP_BASE_OU': 'user_search',
+    'LDAP_GROUP_OU': 'group_search'
 }
 """
     - **LDAP_SERVER**: hostname of ldap server (file option: *server*)

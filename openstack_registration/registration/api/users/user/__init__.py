@@ -6,6 +6,7 @@ from registration.api.users.user import post as user_post
 from registration.api.users.user import put as user_put
 from registration.api.users.user import delete as user_delete
 
+
 def dispatcher(request, username):
     """
     dispatcher function is defined on __init__ file to avoid some strange call and have a clear call

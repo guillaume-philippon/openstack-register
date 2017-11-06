@@ -26,7 +26,7 @@ def html(request, username):
         })
     # else, we display the user information form.
     else:
-        response = user_information_html(request, username=username)
+        response = user_information(request, username=username)
     return response
 
 
@@ -39,12 +39,20 @@ def json(request, username):  # pylint: disable=unused-argument
     :return: JsonResponses
     """
     backend = OpenLdapUserBackend()
-    response = backend.get(username=username)
+    user = backend.get(username=username)
+    # If the response is empty, then when want to create a new user. So we load register page
+    if not user:
+        response = {
+            'status': 'UserNotExist'
+        }
+    # else, we display the user information form.
+    else:
+        response = user_information(request, username=username)
     return JsonResponse(response, safe=False)
 
 
 @owner_required
-def user_information_html(request, username):  # pylint: disable=unused-argument
+def user_information(request, username):  # pylint: disable=unused-argument
     """
     To have a easiest permission support, we split user information rendering and we decorate
     function with @owner_required.
@@ -53,4 +61,9 @@ def user_information_html(request, username):  # pylint: disable=unused-argument
     :param username: required for @owner_required decorator
     :return: HTTP rendering
     """
-    return render(request, 'users/user/home.html')
+    if 'format' in request.GET and request.GET['format'] == 'json':
+        backend = OpenLdapUserBackend()
+        response = backend.get(username=username)
+    else:
+        response = render(request, 'users/user/home.html')
+    return response

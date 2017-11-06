@@ -18,7 +18,7 @@ class SaveButton {
                 valid = false;
             }
         }
-
+        console.log(this.field)
         /* If all options are valid, then we enable button */
         if (valid) {
             $(this.field).removeClass('disabled');

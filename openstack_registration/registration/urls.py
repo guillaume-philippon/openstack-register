@@ -25,10 +25,14 @@ urlpatterns = [  # pylint: disable=invalid-name
     url(r'^login', views.login),
     url(r'^logout', views.logout),
 
-    # users view
+    # /users view
     url(r'^users[/]?$', api.users.dispatcher),
     url(r'^users/(?P<username>[\w\.\-_]+)$', api.users.dispatcher),
     url(r'^users/(?P<username>[\w\.\-_]+)/(?P<attributes>[\w]+)$', api.users.dispatcher),
+
+    # /groups view
+    url(r'^groups[/]?$', api.groups.dispatcher),
+    url(r'^groups/(?P<group>[\w\.\-_]+)$', api.groups.dispatcher),
 
     # Administration view
     # url(r'^admin/$', views.admin_dispatcher),

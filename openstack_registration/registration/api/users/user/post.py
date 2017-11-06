@@ -8,6 +8,7 @@ from django.contrib import auth
 from registration.Backend.OpenLdap import OpenLdapUserBackend
 from registration.notification.MailNotification import MailNotification
 
+
 def json(request, username):  # pylint: disable=unused-argument
     """
     Create a user based on request content and username uri

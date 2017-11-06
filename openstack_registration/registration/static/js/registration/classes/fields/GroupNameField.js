@@ -1,8 +1,8 @@
-class UsernameField extends StandardField {
+class GroupNameField extends StandardField {
     constructor (field) {
         super(field);
         this.field = field;
-        this.uri_prefix = '/users/';
+        this.uri_prefix = '/groups/';
     }
 
     validate() {
@@ -11,8 +11,8 @@ class UsernameField extends StandardField {
         var field_name = this.field;
         var group_field_name = this.field + this.group_suffix;
 
-        return $.getJSON(uri, { 'format': 'json' }, function (data){
-            if (data.status == 'UserNotExist') {
+        return $.getJSON(uri, { 'format': 'json'}, function (data){
+            if (data.status == 'GroupNotExist') {
                 $(group_field_name).removeClass('has-error');
                 $(group_field_name).addClass('has-success');
                 return true;
