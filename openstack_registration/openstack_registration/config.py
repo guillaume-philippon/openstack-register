@@ -21,8 +21,9 @@ file listed have the highest priority
 GLOBAL_CONFIG = {
     # [auth]
     'LDAP_SERVER': 'ldap://127.0.0.1',
-    'LDAP_BASE_OU': 'ou=users,o=cloud',
+    'LDAP_USER_OU': 'ou=users,o=cloud',
     'LDAP_GROUP_OU': 'ou=groups,o=cloud',
+    'LDAP_ADMIN_GROUP': 'admin',
 
     # [django]
     'DJANGO_SECRET_KEY': 'This should be change',  # Should be declare to allow doc generation
@@ -43,15 +44,17 @@ AUTH_OPTIONS = {
     'LDAP_SERVER': 'server',
     'LDAP_USER': 'bind_dn',
     'LDAP_PASSWORD': 'password',
-    'LDAP_BASE_OU': 'user_search',
-    'LDAP_GROUP_OU': 'group_search'
+    'LDAP_USER_OU': 'user_search',
+    'LDAP_GROUP_OU': 'group_search',
+    'LDAP_ADMIN_GROUP': 'admin_group'
 }
 """
     - **LDAP_SERVER**: hostname of ldap server (file option: *server*)
     - **LDAP_USER**: DN of ldap user (file option: *bind_dn*)
     - **LDAP_PASSWORD**: password of ldap user (file option: *password*)
-    - **LDAP_BASE_OU**: The base search for user in ldap
+    - **LDAP_USER_OU**: The base search for user in ldap
     - **LDAP_GROUP_OU**: The base search for group in ldap
+    - **LDAP_ADMIN_GROUP**: admin ldap name
 
 """
 

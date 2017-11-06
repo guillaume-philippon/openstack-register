@@ -33,7 +33,7 @@ class OpenLdap(object):
         self.server = GLOBAL_CONFIG['LDAP_SERVER']
         self.user = GLOBAL_CONFIG['LDAP_USER']
         self.password = GLOBAL_CONFIG['LDAP_PASSWORD']
-        self.base_ou = GLOBAL_CONFIG['LDAP_BASE_OU']
+        self.base_ou = GLOBAL_CONFIG['LDAP_USER_OU']
         self.connection = ldap.initialize(self.server)
 
         try:
@@ -253,7 +253,7 @@ class OpenLdapBackend(object):  # pylint: disable=too-few-public-methods
         self.server = GLOBAL_CONFIG['LDAP_SERVER']
         self.user = GLOBAL_CONFIG['LDAP_USER']
         self.password = GLOBAL_CONFIG['LDAP_PASSWORD']
-        self.base_ou = GLOBAL_CONFIG['LDAP_BASE_OU']
+        self.base_ou = GLOBAL_CONFIG['LDAP_USER_OU']
         self.group_ou = GLOBAL_CONFIG['LDAP_GROUP_OU']
         self.connection = ldap.initialize(self.server)
 
@@ -289,8 +289,8 @@ class OpenLdapUserBackend(OpenLdapBackend):
         :param attributes: User attributes in dict. format
         :return: void
         """
-        user = "uid={username},{base_ou}".format(username=attributes['username'],
-                                                 base_ou=GLOBAL_CONFIG['LDAP_BASE_OU'])
+        user = "uid={username},{user_ou}".format(username=attributes['username'],
+                                                 user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
         # We generate the "ldif-like" entry. ldap module need to have a specific format, entries
         # must be give as a list of tuple and value must always be a list.
         # We also need to for str for attributes as there are some strange unicode issue.
@@ -323,8 +323,8 @@ class OpenLdapUserBackend(OpenLdapBackend):
         :param attributes: attributes
         :return: void
         """
-        user = 'uid={username},{base_ou}'.format(username=username,
-                                                 base_ou=GLOBAL_CONFIG['LDAP_BASE_OU'])
+        user = 'uid={username},{user_ou}'.format(username=username,
+                                                 user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
         ldif = list()
         for attribute in attributes:
             if attribute == 'email':
@@ -347,8 +347,8 @@ class OpenLdapUserBackend(OpenLdapBackend):
         :param username: username
         :return: void
         """
-        user = 'uid={username},{base_ou}'.format(username=username,
-                                                 base_ou=GLOBAL_CONFIG['LDAP_BASE_OU'])
+        user = 'uid={username},{user_ou}'.format(username=username,
+                                                 user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
         self.connection.delete_s(user)
 
     @staticmethod
@@ -390,7 +390,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         """
         response = list()
         groups = self.connection.search_s(self.group_ou, ldap.SCOPE_SUBTREE,
-                                          "(&(objectClass=groupOfNames)"
+                                          "(&(objectClass=groupOfUniqueNames)"
                                           "(cn={cn}))".format(cn=group),
                                           ['cn', 'description'])
         for _, attributes in groups:
@@ -405,11 +405,11 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         :return: void
         """
         user = "uid={username},{user_ou}".format(username=attributes['username'],
-                                                 user_ou=GLOBAL_CONFIG['LDAP_BASE_OU'])
+                                                 user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
         group = "cn={name},{group_ou}".format(name=attributes['name'],
                                               group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
         group_attributes = [
-            ('objectClass', ['groupOfNames', 'top']),
+            ('objectClass', ['groupOfUniqueNames', 'top']),
             ('cn', str(attributes['name'])),
             ('member', user),
             ('description', 'Generated group')
