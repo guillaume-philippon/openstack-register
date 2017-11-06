@@ -10,7 +10,7 @@ from registration.decorators import groupadmin_required
 
 # We need to have, @ least, groupadmin privilegies to list groups
 @groupadmin_required
-def json(request, group):
+def json(request, group, attribute):
     """
     Return a Json rendering for GET request in /groups/*group*
 
@@ -19,7 +19,7 @@ def json(request, group):
     :return: HTTP rendering
     """
     backend = OpenLdapGroupBackend()
-    group = backend.get(group=group)
+    group = backend.get(group=group, attribute=attribute)
     # If the response is empty, then when want to create a new user. So we load register page
     if not group:
         response = JsonResponse({
@@ -40,4 +40,4 @@ def html(request, group):
     :param group: group
     :return: HTTP rendering
     """
-    return JsonResponse(dict())
+    return render(request, 'groups/group/home.html')

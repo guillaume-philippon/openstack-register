@@ -21,8 +21,8 @@ function getGroups() {
             {
                 data: 'name',
                 render: function(data, type, row) {
-                    return '<p><a href="#" class="btn" onclick="openEditModal(\'' +
-                            data + '\')"><span class="glyphicon ' +
+                    return '<p><a href="/groups/' + data + '" class="btn"> ' +
+                            '<span class="glyphicon ' +
                             'glyphicon-pencil"></span></a>' +
                            '<a href="#" class="btn text-danger" onclick="openGroupDeleteModal(\'' +
                             data + '\')"><span class="glyphicon ' +

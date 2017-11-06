@@ -2,243 +2,28 @@
 OpenLdap backend support
 """
 # -*- coding: utf-8 -*-
+import re
 
 import ldap
 import ldap.sasl
 
+from registration.Backend.Exceptions import AdminGroupDelete, NotGroupAttribute
+
 from registration.utils import encode_password
 from registration.exceptions import InvalidX500DN
-from registration.models import UserActivation
 
 from openstack_registration.config import GLOBAL_CONFIG
 
-ATTRIBUTE_BINDING = {
-    'email': 'mail',
-    'firstname': 'givenName',
-    'lastname': 'sn',
-    'password': 'userPassword'
+# Some regular expression to format ldap output
+USER_LDAP_REGEXP=r"uid=(.*),{user_ou}".format(user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
+GROUP_LDAP_REGEXP=r"cn=(.*),{group_ou}".format(group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+
+GROUP_ATTRIBUTES = {
+    'admins': 'owner',
+    'members': 'uniqueMember',
+    'description': 'description',
+    'name': 'cn'
 }
-
-
-# TODO: Should be named OpenLdapBackend to avoid miss-lead
-class OpenLdap(object):
-    """
-    OpenLdap Backend support is based on PrototypeBackend
-    """
-    def __init__(self):
-        """
-        initialize Backend
-        """
-        super(OpenLdap, self).__init__()
-        self.server = GLOBAL_CONFIG['LDAP_SERVER']
-        self.user = GLOBAL_CONFIG['LDAP_USER']
-        self.password = GLOBAL_CONFIG['LDAP_PASSWORD']
-        self.base_ou = GLOBAL_CONFIG['LDAP_USER_OU']
-        self.connection = ldap.initialize(self.server)
-
-        try:
-            self.connection.simple_bind_s(self.user, self.password)
-        except:  # pylint: disable=bare-except
-            print 'error during openLdap connection'
-
-    def delete_user_from_group(self, user, group):
-        """
-        Delete user from group
-        :param user: user that should be removed
-        :param group: group from where the user is removed
-        :return:
-        """
-        dn_user = user.encode('utf-8')
-        dn_group = group.encode('utf-8')
-        # TODO: WTF !!!
-        ok = False  # pylint: disable=invalid-name
-        try:
-            self.connection.modify_s(dn_group,
-                                     [(ldap.MOD_DELETE,  # pylint: disable=no-member
-                                       'uniqueMember', dn_user)])
-            ok = True  # pylint: disable=invalid-name
-        except:  # pylint: disable=bare-except
-            print "Error while removing user " + dn_user + " from group " + dn_group
-        return ok
-
-    def add_user_from_group(self, user, group):
-        """
-        Add user to a group
-        :param user:
-        :param group:
-        :return:
-        """
-        dn_user = user.encode('utf-8')
-        dn_group = group.encode('utf-8')
-        ok = False  # pylint: disable=invalid-name
-        try:
-            self.connection.modify_s(dn_group,
-                                     [(ldap.MOD_ADD,  # pylint: disable=no-member
-                                       'uniqueMember', dn_user)])
-            ok = True  # pylint: disable=invalid-name
-        except ldap.TYPE_OR_VALUE_EXISTS:  # pylint: disable=no-member
-            return False
-        except:  # pylint: disable=bare-except
-            print "Error while adding user " + dn_user + " from group " + dn_group
-        return ok
-
-    # TODO: addGroup should be renamed
-    def addGroup(self, group, desc, user): # pylint: disable=invalid-name
-        """
-        Create a new group
-        :param group: group named
-        :param desc: description of the group
-        :param user: first user of the group
-        :return: void
-        """
-        attributes = []
-        # TODO: Base ou for group should be put on configuration file
-        dn_group = "cn={},ou=groups,o=cloud".format(str(group))
-        attrs = {
-            'objectClass': ['groupOfUniqueNames', 'top'],
-            'cn': "{}".format(str(group)),
-            'uniqueMember': "uid={},ou=users,o=cloud".format(str(user)),
-        }
-        if desc != "":
-            attrs['description'] = str(desc)
-        for value in attrs:
-            entry = (value, attrs[value])
-            attributes.append(entry)
-        self.connection.add_s(dn_group, attributes)
-
-    def search_user(self, uid=None, mail=None, attributes=None, password=None, pager=None):  # pylint: disable=too-many-arguments
-        """
-        Search a user based on some filter
-        :param uid: uid of the user
-        :param mail: email of the user
-        :param attributes: attributes of the user
-        :param password: password of the user
-        :param pager: status of the user
-        :return:
-        """
-        if uid is not None and mail is not None and pager is not None:
-            return self.connection.search_s(self.base_ou,
-                                            ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                            "(&(objectClass=person)(uid=*))",
-                                            ['uid', 'mail', 'pager'])
-        if uid is not None and mail is not None:
-            return self.connection.search_s(self.base_ou,
-                                            ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                            "(&(objectClass=person)(uid=*))",
-                                            ['uid', 'mail'])
-        elif uid is not None:
-            return self.connection.search_s(self.base_ou,
-                                            ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                            "(&(objectClass=person)(uid={}))"
-                                            .format(uid),
-                                            ['uid'])
-        elif mail is not None:
-            return self.connection.search_s(self.base_ou,
-                                            ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                            "(&(objectClass=person)(mail={}))"
-                                            .format(mail),
-                                            ['mail'])
-        elif attributes is not None:
-            return self.connection.search_s(self.base_ou,
-                                            ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                            "(&(objectClass=person)(uid={}))"
-                                            .format(attributes),
-                                            ['uid', 'mail', 'givenName', 'sn', 'cn'])
-        elif password is not None:
-            return self.connection.search_s(self.base_ou,
-                                            ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                            "(&(objectClass=person)(uid={}))"
-                                            .format(password),
-                                            ['userPassword'])
-
-    def search_groups(self):
-        """
-        List all groups
-        :return: list
-        """
-        return self.connection.search_s('ou=groups,o=cloud',
-                                        ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                        "(&(objectClass=groupOfUniqueNames)(cn=*))",
-                                        ['cn'])
-
-    def search_group(self, uid):
-        """
-        Search a specific group
-        :param uid:
-        :return:
-        """
-        return self.connection.search_s('ou=groups,o=cloud',
-                                        ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
-                                        "(&(objectClass=groupOfUniqueNames)(cn={}))"
-                                        .format(uid),
-                                        ['uniqueMember', 'cn', 'description'])
-
-    def modify_user(self, uid, action):
-        """
-        Modify user entry
-        :param uid: uid
-        :param action: action that should be done
-        :return: void
-        """
-        attrs = {}
-        if action == 'enable':
-            pager = "512"
-        else:
-            pager = "514"
-        user_attributes = self.search_user(attributes=uid)
-        dn_user = str(user_attributes[0][0])
-
-        update_attrs = [(ldap.MOD_REPLACE, 'pager', pager)]  # pylint: disable=no-member
-        try:
-            self.connection.modify_s(dn_user, update_attrs)
-            attrs['status'] = 'success'
-        except:  # pylint: disable=bare-except
-            attrs['status'] = 'fail'
-        return attrs
-
-    def enable_user(self, uuid):
-        """
-        Enable user
-        :param uuid: uuid of the user
-        :return: void
-        """
-        attrs = {}
-        user = UserActivation.objects.filter(link=uuid)  # pylint: disable=no-member
-
-        if user:
-            username = user[0].username
-            user_attributes = self.search_user(attributes=username)
-            dn_user = str(user_attributes[0][0])
-            email = str(user_attributes[0][1]['mail'][0])
-            firstname = str(user_attributes[0][1]['givenName'][0])
-            lastname = str(user_attributes[0][1]['sn'][0])
-            update_attrs = [(ldap.MOD_REPLACE, 'pager', '512')]  # pylint: disable=no-member
-            attrs['mail'] = email
-            attrs['username'] = username
-            attrs['firstname'] = firstname
-            attrs['lastname'] = lastname
-
-            self.connection.modify_s(dn_user, update_attrs)
-            user.delete()
-        return attrs
-
-    def change_user_password(self, user, password):
-        """
-        Change user password
-        :param user: user
-        :param password: new password
-        :return: void
-        """
-        attrs = {}
-        user_attributes = self.search_user(attributes=user)
-        dn_user = str(user_attributes[0][0])
-        update_attrs = [(ldap.MOD_REPLACE, 'userPassword', password)]  # pylint: disable=no-member
-        try:
-            self.connection.modify_s(dn_user, update_attrs)
-            attrs['status'] = 'success'
-        except:  # pylint: disable=bare-except
-            attrs['status'] = 'fail'
-        return attrs
 
 
 class OpenLdapBackend(object):  # pylint: disable=too-few-public-methods
@@ -381,18 +166,23 @@ class OpenLdapGroupBackend(OpenLdapBackend):
     """
     Provide tools to manage a group store on LDAP backend
     """
-    def get(self, group='*'):
+    def get(self, group='*', attribute=None):
         """
         Return a list of groups based on filter
 
+        :param attribute: If a specific attribute is ask
         :param group: group filter, by default we get all groups
         :return: list of dict
         """
         response = list()
+        if attribute is None:
+            output = ['cn', 'description']
+        else:
+            output = [GROUP_ATTRIBUTES[attribute]]
         groups = self.connection.search_s(self.group_ou, ldap.SCOPE_SUBTREE,
                                           "(&(objectClass=groupOfUniqueNames)"
                                           "(cn={cn}))".format(cn=group),
-                                          ['cn', 'description'])
+                                          output)
         for _, attributes in groups:
             response.append(self._ldap_to_dict(attributes))
         return response
@@ -424,6 +214,9 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         :param groupname: group name
         :return: void
         """
+        # If groupname is LDAP_ADMIN_GROUP we refuse to remove it
+        if groupname == GLOBAL_CONFIG['LDAP_ADMIN_GROUP']:
+            raise AdminGroupDelete
         group = 'cn={groupname},{group_ou}'.format(groupname=groupname,
                                                    group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
         self.connection.delete_s(group)
@@ -431,14 +224,24 @@ class OpenLdapGroupBackend(OpenLdapBackend):
     @staticmethod
     def _ldap_to_dict(attributes):
         """
+        Format ldap output to be compliant with API.
 
-
-        :param attributes:
-        :return:
+        :param attributes: attributes to format
+        :return: list
         """
-        print attributes
-        response = {
-            'name': attributes['cn'][0],
-            'description': attributes['description'][0]
-        }
+        response = dict()
+        if 'cn' in attributes:
+            response['name'] = attributes['cn'][0]
+        if 'description' in attributes:
+            response['description'] = attributes['description'][0]
+        if 'uniqueMember' in attributes:
+            members = list()
+            for member in attributes['uniqueMember']:
+                members.append(re.sub(USER_LDAP_REGEXP, r'\1', member))
+            response['members'] = members
+        if 'owner' in attributes:
+            admins = list()
+            for admin in attributes['owner']:
+                admins.append(re.sub(USER_LDAP_REGEXP, r'\1', admin))
+            response['admins'] = admins
         return response

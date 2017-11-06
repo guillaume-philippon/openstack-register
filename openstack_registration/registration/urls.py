@@ -33,26 +33,11 @@ urlpatterns = [  # pylint: disable=invalid-name
     # /groups view
     url(r'^groups[/]?$', api.groups.dispatcher),
     url(r'^groups/(?P<group>[\w\.\-_]+)$', api.groups.dispatcher),
-
-    # Administration view
-    # url(r'^admin/$', views.admin_dispatcher),
-    # url(r'^admin/users', views.admin_users_dispatcher),
+    url(r'^groups/(?P<group>[\w\.\-_]+)/(?P<attribute>[\w]+)$', api.groups.dispatcher),
 
     # Policies view
     url(r'^policies', views.policies),
 
     # logs view
     # url(r'^logs$', views.logs_dispatcher),
-
-    # Registration view
-    # url(r'^register', api.register.dispatcher),
-
-    # Watcha view
-    # url(r'^attributes', views.attributes_dispatcher),
-    # url(r'^action', views.activate_user),
-    # url(r'^logged', views.user_is_authenticate),
-    # url(r'^isGroupAdmin', views.user_is_group_admin),
-    # url(r'^isAdmin', views.user_is_admin),
-    # url(r'^groupAdmin/$', views.groups_dispatcher),
-    # url(r'^groupAdmin/[\w]+', views.group_dispatcher),
 ]
