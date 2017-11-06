@@ -49,7 +49,6 @@ function getUsers() {
 }
 
 function openUserDeleteModal(username) {
-    console.log(USER_DELETE_USERNAME + ' = ' + username);
     USER_INFORMATION = {
         'username': username,
     };

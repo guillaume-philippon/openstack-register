@@ -5,12 +5,14 @@ from django.shortcuts import render
 from django.http import JsonResponse
 
 from registration.Backend import OpenLdapGroupBackend
-from registration.decorators import owner_required
+from registration.decorators import groupadmin_required
 
 
+# We need to have, @ least, groupadmin privilegies to list groups
+@groupadmin_required
 def json(request, group):
     """
-    Return a HTML rendering for GET request in /users/*username*
+    Return a Json rendering for GET request in /groups/*group*
 
     :param request: Web request
     :param group: group of the user
@@ -18,7 +20,6 @@ def json(request, group):
     """
     backend = OpenLdapGroupBackend()
     group = backend.get(group=group)
-    print group
     # If the response is empty, then when want to create a new user. So we load register page
     if not group:
         response = JsonResponse({
@@ -28,3 +29,15 @@ def json(request, group):
     else:
         response = JsonResponse(group, safe=False)
     return response
+
+
+@groupadmin_required
+def html(request, group):
+    """
+    Return a HTML rendering for GET request in /groups/*group*
+
+    :param request: Web request
+    :param group: group
+    :return: HTTP rendering
+    """
+    return JsonResponse(dict())

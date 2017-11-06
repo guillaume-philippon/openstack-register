@@ -28,7 +28,7 @@ def json(request, username):  # pylint: disable=unused-argument
         'email': request.POST['email']
     }
     ldap.create(attributes)
-    notification.notify(attributes)
+    # notification.notify(attributes)
 
     # After creating the user, we automaticaly logged him
     user = auth.authenticate(username=username,

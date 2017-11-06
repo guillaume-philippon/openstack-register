@@ -1,0 +1,33 @@
+<div class="modal fade" id="group-delete-modal" tabindex="-2" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row form-register">
+                    <div class="well well-lg">
+                        <p class="text-center">
+                            <h1 class="text-center">
+                                <span class="glyphicon glyphicon-warning-sign text-danger text-center"></span>
+                                <span class="glyphicon glyphicon-warning-sign text-danger text-center"></span>
+                                <span class="glyphicon glyphicon-warning-sign text-danger text-center"></span>
+                            </h1>
+                            <h4 class="text-center">You will remove <span id="group-delete-name">
+                                your</span> group</h4>
+                        </p>
+                    </div>
+
+                    <!-- Register button -->
+                    <div class="col-sm-4">
+                        <a class="btn btn-lg btn-danger btn-block"
+                           id="user-delete-btn" onclick="deleteGroup('{{ csrf_token }}')"
+                           >Yes, I'm sure</a>
+                    </div>
+                    <div class="col-sm-8">
+                        <a class="btn btn-lg btn-success btn-block"
+                           id="user-cancel-btn" onclick="cancelGroup()"
+                           >Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

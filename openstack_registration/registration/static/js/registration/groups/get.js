@@ -5,8 +5,6 @@ GROUP_INFORMATION = null;
 GROUP_INFORMATION_URI = '/groups/';
 GROUP_INFORMATION_TABLE = '#table-groups';
 
-
-
 function getGroups() {
     $(GROUP_INFORMATION_TABLE).DataTable({
         ajax: {
@@ -15,6 +13,7 @@ function getGroups() {
                 'format': 'json',
             },
             dataSrc: function(groups){
+                GROUP_INFORMATION = groups;
                 return groups;
             },
         },
@@ -25,7 +24,7 @@ function getGroups() {
                     return '<p><a href="#" class="btn" onclick="openEditModal(\'' +
                             data + '\')"><span class="glyphicon ' +
                             'glyphicon-pencil"></span></a>' +
-                           '<a href="#" class="btn text-danger" onclick="openUserDeleteModal(\'' +
+                           '<a href="#" class="btn text-danger" onclick="openGroupDeleteModal(\'' +
                             data + '\')"><span class="glyphicon ' +
                             'glyphicon-trash"></span></a></p>';
                 },
@@ -35,6 +34,14 @@ function getGroups() {
             { data: 'description' }
         ],
     });
+}
+
+function openGroupDeleteModal(group) {
+    $(GROUP_DELETE_NAME).text(group);
+    GROUP_INFORMATION = {
+        'name': group
+    };
+    $(GROUP_DELETE_MODAL).modal('show');
 }
 
 function openGroupCreateModal() {

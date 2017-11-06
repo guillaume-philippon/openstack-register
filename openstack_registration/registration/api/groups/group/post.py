@@ -22,6 +22,7 @@ def json(request, group):  # pylint: disable=unused-argument
     attributes = {
         'username': request.user.get_username(),
         'name': group,
+        'description': request.POST['description']
     }
     ldap.create(attributes)
     response = JsonResponse({

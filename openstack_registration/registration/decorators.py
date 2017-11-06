@@ -28,8 +28,9 @@ def owner_required(view):
         :return: function
         """
         user = request.user.get_username()
-        if user == kwargs['username']\
-                or request.user.is_superuser\
+        if ( 'username' in kwargs
+             and user == kwargs['username']) \
+                or request.user.is_superuser \
                 or user == GLOBAL_CONFIG['ADMIN_UID']:
             return view(request, *args, **kwargs)
         else:
@@ -42,6 +43,32 @@ def owner_required(view):
 def superuser_required(view):
     """
     If the request require superuser access, we use @superuser_required decorator
+
+    :param view: The view that will be decorator
+    :return: function
+    """
+    @wraps(view)
+    def wrap(request, *args, **kwargs):
+        """
+        Wrapper function
+
+        :param request: Web request
+        :param args: package view function arguments as a list
+        :param kwargs: package view function arguments as a dict
+        :return: function
+        """
+        if request.user.is_superuser:
+            return view(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+    wrap.__doc__ = view.__doc__
+    wrap.__name__ = view.__name__
+    return wrap
+
+
+def groupadmin_required(view):
+    """
+    If the request require group access, we use @superuser_required decorator
 
     :param view: The view that will be decorator
     :return: function

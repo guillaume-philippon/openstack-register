@@ -3,15 +3,20 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="row">
+                    <h1 class="text-center">Login</h1>
                     <div class="col-sm-6 col-sm-offset-3">
                         <label for="login-username" class="sr-only">Username</label>
-                        <input type="text" id="login-username" class="form-control" placeholder="Username" required autofocus name="username">
-
-                        <label for="login-password" class="sr-only">Password</label>
-                        <input type="password" id="login-password" class="form-control" placeholder="Password" required name="password">
-
+                        <input type="text"
+                               id="login-username" class="form-control" placeholder="Username"
+                               required autofocus name="username">
                         <br/>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit" onclick="login('{{ csrf_token }}')">Sign on</button>
+                        <label for="login-password" class="sr-only">Password</label>
+                        <input type="password" id="login-password" class="form-control"
+                               placeholder="Password" required name="password">
+                        <br/>
+                        <br/>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit"
+                                onclick="login('{{ csrf_token }}')">Sign on</button>
                     </div>
                 </div>
             </div>

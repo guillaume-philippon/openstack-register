@@ -1,7 +1,9 @@
 """
 Provide RESTful API for uri://groups/**group** request
 """
-from registration.api.groups.group import get as group_get, post as group_post
+from registration.api.groups.group import get as group_get, \
+    post as group_post, \
+    delete as group_delete
 
 
 def dispatcher(request, group):
@@ -21,6 +23,10 @@ def dispatcher(request, group):
     if request.method == 'GET':
         if 'format' in request.GET and request.GET['format'] == 'json':
             response = group_get.json(request, group=group)
+        else:
+            response = group_get.html(request, group=group)
     elif request.method == 'POST':
         response = group_post.json(request, group=group)
+    elif request.method == 'DELETE':
+        response = group_delete.json(request, group=group)
     return response

@@ -412,9 +412,21 @@ class OpenLdapGroupBackend(OpenLdapBackend):
             ('objectClass', ['groupOfUniqueNames', 'top']),
             ('cn', str(attributes['name'])),
             ('uniqueMember', user),
-            ('description', 'Generated group')
+            ('owner', user),
+            ('description', str(attributes['description']))
         ]
         self.connection.add_s(group, group_attributes)
+
+    def delete(self, groupname):
+        """
+        Delete group entry
+
+        :param groupname: group name
+        :return: void
+        """
+        group = 'cn={groupname},{group_ou}'.format(groupname=groupname,
+                                                   group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+        self.connection.delete_s(group)
 
     @staticmethod
     def _ldap_to_dict(attributes):
