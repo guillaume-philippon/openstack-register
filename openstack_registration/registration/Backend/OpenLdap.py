@@ -401,7 +401,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         """
         Create a group
 
-        :param name: name of the group
+        :param attributes: group attributes
         :return: void
         """
         user = "uid={username},{user_ou}".format(username=attributes['username'],
@@ -411,7 +411,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         group_attributes = [
             ('objectClass', ['groupOfUniqueNames', 'top']),
             ('cn', str(attributes['name'])),
-            ('member', user),
+            ('uniqueMember', user),
             ('description', 'Generated group')
         ]
         self.connection.add_s(group, group_attributes)
