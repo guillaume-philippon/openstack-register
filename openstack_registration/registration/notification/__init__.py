@@ -1,0 +1,1 @@
+from registration.notification import MailNotification

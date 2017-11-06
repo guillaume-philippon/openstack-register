@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.contrib import auth
 
 from registration.Backend.OpenLdap import OpenLdapUserBackend
-
+from registration.notification.MailNotification import MailNotification
 
 def json(request, username):  # pylint: disable=unused-argument
     """
@@ -17,6 +17,8 @@ def json(request, username):  # pylint: disable=unused-argument
     :return: Json rendering
     """
     ldap = OpenLdapUserBackend()
+    notification = MailNotification()
+
     attributes = {
         'username': username,
         'lastname': request.POST['lastname'],
@@ -25,6 +27,7 @@ def json(request, username):  # pylint: disable=unused-argument
         'email': request.POST['email']
     }
     ldap.create(attributes)
+    notification.notify(attributes)
 
     # After creating the user, we automaticaly logged him
     user = auth.authenticate(username=username,

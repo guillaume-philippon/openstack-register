@@ -1,17 +1,36 @@
-/*
-Javascript module to manage all user related interaction with openstack-registration.
-*/
+/**************************
+* Define GLOBAL variables *
+***************************/
+USER_INFORMATION = null;
 
-/* getUserAttributes get information for the logged user. If there are more than one response or the
-response is empty, then there are a problem */
+/* Define the HTML id that will use for user information show */
+USER_INFORMATION_FORM = {
+    'username': '#username-info',
+    'email': '#email-info',
+    'firstname': '#firstname-info',
+    'lastname': '#lastname-info'
+};
+
+/******************
+* Define function *
+*******************/
 function getUserAttributes() {
-    $.getJSON(location.pahtname, {format: 'json'}
-    ).done(
-        function (users) {
-            $('#username-info').text(users[0].uid);
-            $('#email-info').text(users[0].mail);
-            $('#firstname-info').text(users[0].firstname);
-            $('#lastname-info').text(users[0].lastname);
+    $.getJSON(location.pahtname, {format: 'json'}, function (users) {
+            /* put all information in a User class */
+            USER_INFORMATION = new User(users[0]);
+
+            /* Update the informations field */
+            for (let attribute in USER_INFORMATION_FORM) {
+                $(USER_INFORMATION_FORM[attribute]).text(USER_INFORMATION[attribute]);
+            }
         }
     );
 }
+
+/*******************
+* During load page *
+********************/
+$(function(){
+    /* Load user information */
+    getUserAttributes();
+});

@@ -1,15 +1,30 @@
+/**************************
+* Define GLOBAL variables *
+***************************/
+USER_CREATION_FORM = {
+    'username': '#register-username',
+    'password': '#register-password',
+    'password-check': '#register-password-check',
+    'firstname': '#register-firstname',
+    'lastname': '#register-lastname',
+    'email': '#register-email',
+    'agreement': '#register-agreement'
+};
+USER_CREATION_BUTTON = '#register-btn';
+USER_CREATION_URI = '/users/';
+
 function openRegisterModal() {
     $('#register-modal').modal('show');
 }
 
 $(function(){
     /* Init some variables */
-    password = new PasswordField('#register-password');
-    email = new EmailField('#register-email');
-    username = new UsernameField('#register-username');
-    firstname = new StandardField('#register-firstname');
-    lastname = new StandardField('#register-lastname');
-    agreement = new CheckField('#register-agreement');
+    password = new PasswordField(USER_CREATION_FORM.password);
+    email = new EmailField(USER_CREATION_FORM.email);
+    username = new UsernameField(USER_CREATION_FORM.username);
+    firstname = new StandardField(USER_CREATION_FORM.firstname);
+    lastname = new StandardField(USER_CREATION_FORM.lastname);
+    agreement = new CheckField(USER_CREATION_FORM.agreement);
 
     var mandatory_options = {
         'password': password,
@@ -20,29 +35,17 @@ $(function(){
         'agreement': agreement
     };
 
-    create_button = new SaveButton('#register-btn', mandatory_options,
-                                   '/users/');
+    create_button = new SaveButton(USER_CREATION_BUTTON,
+                                   mandatory_options,
+                                   USER_CREATION_URI);
 
-    /* load action on focusout */
-    $('#register-username').focusout(function () {
-        create_button.validate();
-    });
-    $('#register-password').focusout(function () {
-        create_button.validate();
-    });
-    $('#register-password-check').focusout(function () {
-        create_button.validate();
-    });
-    $('#register-email').focusout(function () {
-        create_button.validate();
-    });
-    $('#register-firstname').focusout(function () {
-        create_button.validate();
-    });
-    $('#register-lastname').focusout(function () {
-        create_button.validate();
-    });
-    $('#register-agreement').change(function () {
-        create_button.validate();
-    });
+    /* jshint ignore:start */
+    /* "jshint" don t like making function in loop but it s the cleanest way to activate focusout
+       trigger w/ jQuery */
+    for (let attribute in USER_CREATION_FORM) {
+        $(USER_CREATION_FORM[attribute]).focusout(function(){
+            create_button.validate();
+        });
+    }
+    /* jshint ignore:end */
 });

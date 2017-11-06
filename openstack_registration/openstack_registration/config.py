@@ -69,13 +69,13 @@ MAIN_OPTIONS = {
 """
 
 MAILING_OPTIONS = {
-    'admin': 'admin',
+    'MAIL_ADMIN': 'admin',
     'MAIL_FROM': 'from',
     'MAIL_SERVER': 'server'
 }
 """
 
-    - **admin**: mail of administrators (file options: *admin*)
+    - **MAIL_ADMIN**: mail of administrators (file options: *admin*)
     - **MAIL_FROM**: mail From field when mail will be sent (file options: *from*)
     - **MAIL_SERVER**: smtp server (file option: *server*)
 
