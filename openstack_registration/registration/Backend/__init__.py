@@ -3,4 +3,4 @@ Provide Backend support.
 """
 # -*- coding: utf-8 -*-
 
-from OpenLdap import OpenLdapUserBackend, OpenLdapGroupBackend
+from registration.Backend.OpenLdap import OpenLdapUserBackend, OpenLdapGroupBackend
