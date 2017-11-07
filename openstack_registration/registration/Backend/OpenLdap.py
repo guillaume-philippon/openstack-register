@@ -207,19 +207,39 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         ]
         self.connection.add_s(group, group_attributes)
 
-    def delete(self, groupname):
+    def delete(self, group, attribute=None, value=None):
         """
         Delete group entry
 
-        :param groupname: group name
+        :param group: group name
+        :param attribute: group name
+        :param value: group name
         :return: void
         """
-        # If groupname is LDAP_ADMIN_GROUP we refuse to remove it
-        if groupname == GLOBAL_CONFIG['LDAP_ADMIN_GROUP']:
-            raise AdminGroupDelete
-        group = 'cn={groupname},{group_ou}'.format(groupname=groupname,
-                                                   group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
-        self.connection.delete_s(group)
+        # If delete is ask for a members or admis, then we just remove the dn of user to member list
+        if attribute == 'members' or attribute == 'admins':
+            self._ldap_remove_dn_to_list(group, attribute, value)
+        else:
+            # If groupname is LDAP_ADMIN_GROUP we refuse to remove it
+            if group == GLOBAL_CONFIG['LDAP_ADMIN_GROUP']:
+                raise AdminGroupDelete
+            group_ldap = 'cn={group_name},{group_ou}' \
+                         ''.format(group_name=group,
+                                   group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+            self.connection.delete_s(group_ldap)
+
+    def modify(self, group, attribute=None, value=None):
+        """
+        Modify value of a group.
+
+        :param group: group name
+        :param attribute: attribute name
+        :param value: attribute value
+        :return:
+        """
+        if attribute == 'members' or attribute == 'admins':
+            self._ldap_add_dn_to_list(group, attribute, value)
+        pass
 
     @staticmethod
     def _ldap_to_dict(attributes):
@@ -245,3 +265,37 @@ class OpenLdapGroupBackend(OpenLdapBackend):
                 admins.append(re.sub(USER_LDAP_REGEXP, r'\1', admin))
             response['admins'] = admins
         return response
+
+    def _ldap_add_dn_to_list(self, cn, attribute, uid):
+        """
+        Add a dn on a list of DN, useful to add a uniqueMember or a owner to a group
+
+        :param cn:
+        :param attribute:
+        :param uid:
+        :return:
+        """
+        uid_ldap = 'uid={uid},{user_ou}'.format(uid=uid,
+                                                user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
+        cn_ldap = 'cn={cn},{group_ou}'.format(cn=cn,
+                                              group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+        print "Add {} on {} in {}".format(uid_ldap, cn_ldap, GROUP_ATTRIBUTES[attribute])
+        self.connection.modify_s(cn_ldap, [(ldap.MOD_ADD,  # pylint: disable=no-member
+                                            GROUP_ATTRIBUTES[attribute], uid_ldap)])
+
+    def _ldap_remove_dn_to_list(self, cn, attribute, uid):
+        """
+        Add a dn on a list of DN, useful to add a uniqueMember or a owner to a group
+
+        :param cn:
+        :param attribute:
+        :param uid:
+        :return:
+        """
+        uid_ldap = 'uid={uid},{user_ou}'.format(uid=uid,
+                                                user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
+        cn_ldap = 'cn={cn},{group_ou}'.format(cn=cn,
+                                              group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+        print "Add {} on {} in {}".format(uid_ldap, cn_ldap, GROUP_ATTRIBUTES[attribute])
+        self.connection.modify_s(cn_ldap, [(ldap.MOD_DELETE,  # pylint: disable=no-member
+                                            GROUP_ATTRIBUTES[attribute], uid_ldap)])

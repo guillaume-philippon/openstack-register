@@ -4,7 +4,7 @@ Provide view that will be call when a uri:/users request will be call
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from registration.decorators import superuser_required
+from registration.decorators import superuser_required, groupadmin_required
 from registration.Backend import OpenLdapUserBackend
 
 
@@ -20,7 +20,7 @@ def html(request):
     return response
 
 
-@superuser_required
+@groupadmin_required
 def json(request):  # pylint: disable=unused-argument
     """
     Provide a list of user. This view can only be called by a superuser. A PermissionDenied

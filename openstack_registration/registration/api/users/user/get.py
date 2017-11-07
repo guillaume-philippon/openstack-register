@@ -37,12 +37,12 @@ def json(request, username):  # pylint: disable=unused-argument
         }
     # else, we display the user information form.
     else:
-        response = user_information(request, user)
+        response = user_information(request, username=username, data=user)
     return JsonResponse(response, safe=False)
 
 
 @owner_required
-def user_information(request, user):  # pylint: disable=unused-argument
+def user_information(request, username, data):  # pylint: disable=unused-argument
     """
     To have a easiest permission support, we split user information rendering and we decorate
     function with @owner_required.
@@ -50,4 +50,4 @@ def user_information(request, user):  # pylint: disable=unused-argument
     :param user: required for @owner_required decorator
     :return: HTTP rendering
     """
-    return user
+    return data

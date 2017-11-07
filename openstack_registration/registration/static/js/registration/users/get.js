@@ -3,6 +3,7 @@
 ***************************/
 USER_INFORMATION = null;
 USER_INFORMATION_URI = '/users/';
+USER_INFORMATION_TABLE = '#table-members';
 //USER_INFORMATION_MODAL = '#user-edit-modal';
 //USER_INFORMATION_FORM = {
 //    'firstname': '#user-edit-firstname',
@@ -12,7 +13,7 @@ USER_INFORMATION_URI = '/users/';
 
 /* function to get all users information and populate datable */
 function getUsers() {
-    $("#table-members").DataTable( {
+    $(USER_INFORMATION_TABLE).DataTable( {
         ajax: {
             url: location.pathname,
             data: {

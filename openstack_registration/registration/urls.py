@@ -34,6 +34,8 @@ urlpatterns = [  # pylint: disable=invalid-name
     url(r'^groups[/]?$', api.groups.dispatcher),
     url(r'^groups/(?P<group>[\w\.\-_]+)$', api.groups.dispatcher),
     url(r'^groups/(?P<group>[\w\.\-_]+)/(?P<attribute>[\w]+)$', api.groups.dispatcher),
+    url(r'^groups/(?P<group>[\w\.\-_]+)/(?P<attribute>[\w]+)/(?P<value>[\w\.\-_]+)$',
+        api.groups.dispatcher),
 
     # Policies view
     url(r'^policies', views.policies),

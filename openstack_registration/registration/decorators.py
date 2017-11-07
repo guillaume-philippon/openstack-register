@@ -4,6 +4,7 @@ Provide a list of decorators that can be use to grant access to some view.
 from functools import wraps
 from django.core.exceptions import PermissionDenied
 
+from registration.Backend.OpenLdap import OpenLdapGroupBackend
 
 from openstack_registration.config import GLOBAL_CONFIG
 
@@ -28,7 +29,7 @@ def owner_required(view):
         :return: function
         """
         user = request.user.get_username()
-        if ( 'username' in kwargs
+        if ('username' in kwargs
              and user == kwargs['username']) \
                 or request.user.is_superuser \
                 or user == GLOBAL_CONFIG['ADMIN_UID']:
@@ -83,10 +84,26 @@ def groupadmin_required(view):
         :param kwargs: package view function arguments as a dict
         :return: function
         """
+        # if we are a superuser, no question, you have access
         if request.user.is_superuser:
             return view(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
+        else:  # else, we ask OpenLdapGroupBackend to see if you are a group admin
+            ldap = OpenLdapGroupBackend()
+            if 'group' in kwargs:
+                group = kwargs['group']
+            else:
+                group = '*'
+            groups = ldap.get(group, attribute='admins')
+            print groups
+            # If group is specify, then we let only group admins to access to data
+            if group is not None and request.user.get_username() in groups[0]['admins']:
+                return view(request, *args, **kwargs)
+            else:  # else, we let any group admin to access to data
+                for group_index in groups:
+                    if request.user.get_username() in group_index['admins']:
+                        return view(request, *args, **kwargs)
+        # at the end, if nothing match, we raise a PermissionDenied
+        raise PermissionDenied
     wrap.__doc__ = view.__doc__
     wrap.__name__ = view.__name__
     return wrap

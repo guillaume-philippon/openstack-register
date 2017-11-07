@@ -14,7 +14,7 @@ def json(request, group):  # pylint: disable=unused-argument
     Create a user based on request content and username uri
 
     :param request: Web request
-    :param name: username
+    :param group: username
     :return: Json rendering
     """
     ldap = OpenLdapGroupBackend()

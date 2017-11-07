@@ -4,11 +4,11 @@ Provide support for HTTP rendering for request uri://groups
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from registration.decorators import superuser_required
+from registration.decorators import superuser_required, groupadmin_required
 from registration.Backend import OpenLdapGroupBackend
 
 
-@superuser_required
+@groupadmin_required
 def html(request):
     """
     Return the HTML page to display groups
@@ -20,7 +20,7 @@ def html(request):
     return response
 
 
-@superuser_required
+@groupadmin_required
 def json(request):
     """
     Return JSON list of groups
