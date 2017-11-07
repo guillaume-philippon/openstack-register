@@ -106,7 +106,7 @@ def handler403(request):
     :return: HTTP rendering
     """
     print 'test'
-    response = render(request, 'error/handler403.html')
+    response = render(request, 'error/handler403.html', status=403)
     return response
 
 
@@ -117,5 +117,5 @@ def handler500(request):
     :param request: Web request
     :return: HTTP rendering
     """
-    response = render(request, 'error/handler500.html')
+    response = render(request, 'error/handler500.html', status=500)
     return response

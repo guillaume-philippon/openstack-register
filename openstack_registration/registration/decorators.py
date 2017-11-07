@@ -105,3 +105,55 @@ def groupadmin_required(view):
     wrap.__doc__ = view.__doc__
     wrap.__name__ = view.__name__
     return wrap
+
+
+def superuser_protection(view):
+    """
+    Make sure we don't try to access a view that can modify superuser
+
+    :param view: The view that will be decorate
+    :return: function
+    """
+    @wraps(view)
+    def wrap(request, *args, **kwargs):
+        """
+        Wrapper funcion
+
+        :param request: Web request
+        :param args: package view function arguments as a list
+        :param kwargs: package view function arguments as a dict
+        :return: function
+        """
+        if ('attribute' in kwargs or kwargs['attribute'] is None) \
+                and not request.user.is_superuser:
+            print "exception"
+            raise PermissionDenied
+        return view(request, *args, **kwargs)
+    wrap.__doc__ = view.__doc__
+    wrap.__name__ = view.__name__
+    return wrap
+
+
+def self_protection(view):
+    """
+    Make sure we don't try to access to delete it-self
+
+    :param view: The view that will be decorate
+    :return: function
+    """
+    @wraps(view)
+    def wrap(request, *args, **kwargs):
+        """
+        Wrapper funcion
+
+        :param request: Web request
+        :param args: package view function arguments as a list
+        :param kwargs: package view function arguments as a dict
+        :return: function
+        """
+        if 'value' in kwargs and kwargs['value'] == request.user.get_username():
+            raise PermissionDenied
+        return view(request, *args, **kwargs)
+    wrap.__doc__ = view.__doc__
+    wrap.__name__ = view.__name__
+    return wrap

@@ -21,12 +21,6 @@ def json(request, group, attribute, value):  # pylint: disable=unused-argument
     """
     ldap = OpenLdapGroupBackend()
 
-    # attributes = {
-    #     'username': request.user.get_username(),
-    #     'name': group,
-    #     'description': request.POST['description']
-    # }
-    # ldap.modify(attributes)
     ldap.modify(group, attribute, value)
     response = JsonResponse({
         'status': 'success'

@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 
-handler403 = "registration.views.handler403"
-handler500 = "registration.views.handler500"
+handler403 = "registration.views.handler403"  # pylint: disable=invalid-name
+handler500 = "registration.views.handler500"  # pylint: disable=invalid-name
 
 urlpatterns = [  # pylint: disable=invalid-name
     url(r'^', include('registration.urls')),
