@@ -5,7 +5,7 @@ GROUP_CREATE_MODAL = '#create-modal';
 GROUP_CREATE_FORM = {
     'name': '#create-name',
     'description': '#create-description'
-}
+};
 GROUP_CREATE_BUTTON = '#create-btn';
 GROUP_CREATE_URI = '/groups/';
 

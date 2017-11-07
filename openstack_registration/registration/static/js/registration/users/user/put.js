@@ -22,7 +22,6 @@ USER_PASSWORD_MODIFICATION_MODAL = '#user-edit-password-modal';
 * Define function *
 *******************/
 function modifyUser(csrf){
-    console.log(USER_INFORMATION);
     modify_button.modify(csrf, USER_INFORMATION.username).done(function(data){
         $(USER_MODIFICATION_MODAL).modal('hide');
         getUserAttributes();

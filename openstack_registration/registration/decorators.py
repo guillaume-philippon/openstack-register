@@ -29,8 +29,7 @@ def owner_required(view):
         :return: function
         """
         user = request.user.get_username()
-        if ('username' in kwargs
-             and user == kwargs['username']) \
+        if ('username' in kwargs and user == kwargs['username']) \
                 or request.user.is_superuser \
                 or user == GLOBAL_CONFIG['ADMIN_UID']:
             return view(request, *args, **kwargs)
@@ -94,9 +93,8 @@ def groupadmin_required(view):
             else:
                 group = '*'
             groups = ldap.get(group, attribute='admins')
-            print groups
             # If group is specify, then we let only group admins to access to data
-            if group is not None and request.user.get_username() in groups[0]['admins']:
+            if groups and group is not None and request.user.get_username() in groups[0]['admins']:
                 return view(request, *args, **kwargs)
             else:  # else, we let any group admin to access to data
                 for group_index in groups:

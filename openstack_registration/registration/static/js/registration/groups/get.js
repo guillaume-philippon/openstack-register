@@ -45,9 +45,9 @@ function openGroupDeleteModal(group) {
 }
 
 function openGroupCreateModal() {
-    $(GROUP_CREATE_MODAL).modal('show')
+    $(GROUP_CREATE_MODAL).modal('show');
 }
 
 $(function(){
     getGroups();
-})
+});

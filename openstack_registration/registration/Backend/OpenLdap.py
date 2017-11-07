@@ -7,7 +7,7 @@ import re
 import ldap
 import ldap.sasl
 
-from registration.Backend.Exceptions import AdminGroupDelete, NotGroupAttribute
+from registration.Backend.Exceptions import AdminGroupDelete
 
 from registration.utils import encode_password
 from registration.exceptions import InvalidX500DN
@@ -15,8 +15,8 @@ from registration.exceptions import InvalidX500DN
 from openstack_registration.config import GLOBAL_CONFIG
 
 # Some regular expression to format ldap output
-USER_LDAP_REGEXP=r"uid=(.*),{user_ou}".format(user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
-GROUP_LDAP_REGEXP=r"cn=(.*),{group_ou}".format(group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+USER_LDAP_REGEXP = r"uid=(.*),{user_ou}".format(user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
+GROUP_LDAP_REGEXP = r"cn=(.*),{group_ou}".format(group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
 
 GROUP_ATTRIBUTES = {
     'admins': 'owner',
@@ -179,7 +179,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
             output = ['cn', 'description']
         else:
             output = [GROUP_ATTRIBUTES[attribute]]
-        groups = self.connection.search_s(self.group_ou, ldap.SCOPE_SUBTREE,
+        groups = self.connection.search_s(self.group_ou, ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
                                           "(&(objectClass=groupOfUniqueNames)"
                                           "(cn={cn}))".format(cn=group),
                                           output)
@@ -239,7 +239,6 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         """
         if attribute == 'members' or attribute == 'admins':
             self._ldap_add_dn_to_list(group, attribute, value)
-        pass
 
     @staticmethod
     def _ldap_to_dict(attributes):
@@ -266,7 +265,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
             response['admins'] = admins
         return response
 
-    def _ldap_add_dn_to_list(self, cn, attribute, uid):
+    def _ldap_add_dn_to_list(self, cn, attribute, uid):  # pylint: disable=invalid-name
         """
         Add a dn on a list of DN, useful to add a uniqueMember or a owner to a group
 
@@ -283,7 +282,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         self.connection.modify_s(cn_ldap, [(ldap.MOD_ADD,  # pylint: disable=no-member
                                             GROUP_ATTRIBUTES[attribute], uid_ldap)])
 
-    def _ldap_remove_dn_to_list(self, cn, attribute, uid):
+    def _ldap_remove_dn_to_list(self, cn, attribute, uid):  # pylint: disable=invalid-name
         """
         Add a dn on a list of DN, useful to add a uniqueMember or a owner to a group
 

@@ -1,5 +1,5 @@
 """
-
+make desc.
 """
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -25,7 +25,7 @@ Openstack Cloud Team
 """
 
 
-class MailNotification(object):
+class MailNotification(object):  # pylint: disable=too-few-public-methods
     """
     Provide needed tools to send a mail notification.
     """
@@ -37,7 +37,6 @@ class MailNotification(object):
         self.from_header = GLOBAL_CONFIG['MAIL_FROM']
         self.bcc_header = GLOBAL_CONFIG['MAIL_ADMIN']
         self.subject = "Openstack Registration Message"
-        pass
 
     def notify(self, user):
         """

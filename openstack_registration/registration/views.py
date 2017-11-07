@@ -3,18 +3,12 @@ View module manage interface between user and openstack-registration. It provide
 on REST good practice.
 """
 # -*- coding: utf-8 -*-
+import logging
 
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, QueryDict, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
-
-from registration.datastore.UserInfoAccess import UserInfoAccess
-
-from registration.Backend import OpenLdap
-from registration.utils import *  # pylint: disable=unused-wildcard-import, wildcard-import
-
-from registration import api
 
 LOGGER = logging.getLogger("registration")
 LOGGER_ERROR = logging.getLogger("registration_error")

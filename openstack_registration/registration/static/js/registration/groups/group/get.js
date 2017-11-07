@@ -25,7 +25,7 @@ function getGroupAttributes() {
             $(GROUP_INFORMATION_FORM[attribute]).html(GROUP_INFORMATION[attribute]);
         }
     });
-};
+}
 
 function getGroupAdmins() {
     $(GROUP_INFORMATION_ADMINS).DataTable({
@@ -35,12 +35,12 @@ function getGroupAdmins() {
                 format: 'json',
             },
             dataSrc: function (data) {
-                members = data[0].admins
-                response = []
+                members = data[0].admins;
+                response = [];
                 for (let member = 0; member < members.length; member++){
                     response[member] = {
                         'admins': members[member]
-                    }
+                    };
                 }
                 return response;
             },
@@ -52,7 +52,7 @@ function getGroupAdmins() {
                     return '<a href="#" class="btn btn-danger btn-sm"' +
                            ' onclick="removeUserToMember(\'' + data + '\', \'admins\')">' +
                            '<span class="glyphicon glyphicon-arrow-left"></span>' +
-                           '</a>'
+                           '</a>';
                 },
                 orderable:  false
             },
@@ -72,12 +72,12 @@ function getGroupMembers() {
                 format: 'json',
             },
             dataSrc: function (data) {
-                members = data[0].members
-                response = []
+                members = data[0].members;
+                response = [];
                 for (let member = 0; member < members.length; member++){
                     response[member] = {
                         'members': members[member]
-                    }
+                    };
                 }
                 return response;
             },
@@ -89,7 +89,7 @@ function getGroupMembers() {
                     return '<a href="#" class="btn btn-danger btn-sm"' +
                            ' onclick="removeUserToMember(\'' + data + '\', \'members\')"> ' +
                            '<span class="glyphicon glyphicon-arrow-left"></span>' +
-                           '</a>'
+                           '</a>';
                 },
                 orderable:  false
             },
@@ -100,7 +100,7 @@ function getGroupMembers() {
                     return '<a href="#" class="btn btn-primary btn-sm"' +
                            ' onclick="addUserToMember(\'' + data + '\', \'admins\')"> ' +
                            '<span class="glyphicon glyphicon-arrow-right"></span>' +
-                           '</a>'
+                           '</a>';
                 },
                 orderable:  false
             },
@@ -130,7 +130,7 @@ function getGroupUsers() {
                     return '<a href="#" class="btn btn-primary btn-sm"' +
                            ' onclick="addUserToMember(\'' + data + '\', \'members\')">' +
                            '<span class="glyphicon glyphicon-arrow-right"></span>' +
-                           '</a>'
+                           '</a>';
                 },
                 orderable:  false
             },

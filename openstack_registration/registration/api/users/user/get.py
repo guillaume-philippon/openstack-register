@@ -9,7 +9,7 @@ from registration.decorators import owner_required
 
 
 @owner_required
-def html(request, username):
+def html(request, username):  # pylint: disable=unused-argument
     """
     Return a HTML rendering for GET request in /users/*username*
 
@@ -47,7 +47,9 @@ def user_information(request, username, data):  # pylint: disable=unused-argumen
     To have a easiest permission support, we split user information rendering and we decorate
     function with @owner_required.
 
-    :param user: required for @owner_required decorator
+    :param request: required for @owner_required decorator
+    :param username: required for @owner_required decorator
+    :param data: required for @owner_required decorator
     :return: HTTP rendering
     """
     return data

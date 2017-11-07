@@ -4,7 +4,7 @@ Provide support for HTTP rendering for request uri://groups
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from registration.decorators import superuser_required, groupadmin_required
+from registration.decorators import groupadmin_required
 from registration.Backend import OpenLdapGroupBackend
 
 
@@ -21,7 +21,7 @@ def html(request):
 
 
 @groupadmin_required
-def json(request):
+def json(request):  # pylint: disable=unused-argument
     """
     Return JSON list of groups
 

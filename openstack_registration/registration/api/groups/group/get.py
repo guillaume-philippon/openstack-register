@@ -10,7 +10,7 @@ from registration.decorators import groupadmin_required
 
 # We need to have, @ least, groupadmin privilegies to list groups
 @groupadmin_required
-def json(request, group, attribute):
+def json(request, group, attribute):  # pylint: disable=unused-argument
     """
     Return a Json rendering for GET request in /groups/*group*
 
@@ -32,7 +32,7 @@ def json(request, group, attribute):
 
 
 @groupadmin_required
-def html(request, group):
+def html(request, group):  # pylint: disable=unused-argument
     """
     Return a HTML rendering for GET request in /groups/*group*
 
