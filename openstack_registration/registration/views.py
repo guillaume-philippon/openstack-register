@@ -96,3 +96,26 @@ def policies(request):
     :return: HTTP rendering
     """
     return render(request, 'policies.html')
+
+
+def handler403(request):
+    """
+    Handle 403 error message
+
+    :param request: Web request
+    :return: HTTP rendering
+    """
+    print 'test'
+    response = render(request, 'error/handler403.html')
+    return response
+
+
+def handler500(request):
+    """
+    Handle 403 error message
+
+    :param request: Web request
+    :return: HTTP rendering
+    """
+    response = render(request, 'error/handler500.html')
+    return response
