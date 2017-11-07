@@ -1,26 +1,24 @@
 """
-Provide RESTful API for uri://groups request based on:
-
-- **method**: (GET / POST / PUT / DELETE)
-- **format**: (json / HTTP)
-
+Provide RESTful API for uri://*groups* request.
 """
 from registration.api.groups import group as groups_group, get as groups_get
 
 
 def dispatcher(request, group=None, attribute=None, value=None):
     """
-    dispatcher function is defined on __init__ file to avoid some strange call and have a clear call
-    like:
-    .. code: python
+    dispatcher function is defined on __init__ file to allow a clear call like: ::
 
         from registration import api
         api.groups.dispatcher
 
-    :param attribute: specific attribute is ask
+    This dispatcher support:
+        - **GET** method: for HTML & JSON rendering
+        - forward request like *uri://groups/group*
+
     :param request: Web request
-    :param group: group
-    :param value: group
+    :param group: Defined if we have a request like *uri://groups/group*
+    :param attribute: Defined if we have a request like *uri://groups/group/attribute*
+    :param value: Defined if we have a request like *uri://groups/group/attribute/value*
     :return: HTTP rendering
     """
     response = None

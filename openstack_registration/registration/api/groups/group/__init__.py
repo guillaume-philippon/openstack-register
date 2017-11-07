@@ -1,5 +1,5 @@
 """
-Provide RESTful API for uri://groups/**group** request
+Provide RESTful API for uri://groups/*group* request.
 """
 from django.http import JsonResponse
 
@@ -11,17 +11,21 @@ from registration.api.groups.group import get as group_get, \
 
 def dispatcher(request, group, attribute, value):
     """
-    dispatcher function is defined on __init__ file to avoid some strange call and have a clear call
-    like:
-    .. code: python
+    dispatcher function is defined on __init__ file to allow a clear call like: ::
 
         from registration import api
-        api.users.user.dispatcher
+        api.groups.group.dispatcher
+
+    This dispatcher support:
+        - **GET** method: for HTML & JSON rendering
+        - **POST** method: for JSON rendering
+        - **DELETE** method: for JSON rendering
+        - **PUT**: for JSON rendering
 
     :param request: Web request
-    :param group: group
-    :param attribute: group
-    :param value: group
+    :param group: group that will be involved in action
+    :param attribute: Defined if request like *uri://groups/group/attribute*
+    :param value: Defined if request like *uri://groups/group/attribute/value*
     :return: HTTP rendering
     """
     response = None

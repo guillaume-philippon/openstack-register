@@ -1,6 +1,5 @@
 """
-Provide support for all *POST* method to uri://users/*username*. *POST* method will allow
-user creation. You will raise AlreadyExist exception if user exist.
+Provide support for **POST** methods on uri://groups/*group* request.
 """
 from django.http import JsonResponse
 
@@ -11,11 +10,16 @@ from registration.Backend.OpenLdap import OpenLdapGroupBackend
 @superuser_required
 def json(request, group):  # pylint: disable=unused-argument
     """
-    Create a user based on request content and username uri
+    JSON rendering for request *uri://groups/group*. It need:
+
+    - superuser account: as superuser have access of all view.
+
+    Call OpenLdapGroupBackend to create a group. The group will have requested user as default
+    member & admin.
 
     :param request: Web request
-    :param group: username
-    :return: Json rendering
+    :param group: that will be created
+    :return: HTTP rendering
     """
     ldap = OpenLdapGroupBackend()
 

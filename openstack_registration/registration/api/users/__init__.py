@@ -11,8 +11,12 @@ def dispatcher(request, username=None):
       from registration import api
       api.users.dispatcher
 
+    This dispatcher support:
+        - **GET** method: for HTML & JSON rendering
+        - forward request like *uri://groups/group*
+
     :param request: Web request
-    :param username: username
+    :param username: Defined if we have a request like *uri://users/username*
     :return: HTTP rendering
     """
     response = None

@@ -1,5 +1,5 @@
 """
-Manage all get method for users REST API
+Provide support for **GET** methods on uri://groups/*group* request.
 """
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -12,10 +12,16 @@ from registration.decorators import groupadmin_required
 @groupadmin_required
 def json(request, group, attribute):  # pylint: disable=unused-argument
     """
-    Return a Json rendering for GET request in /groups/*group*
+    JSON rendering for request *uri://groups/group*. It need:
+
+    - superuser account: as superuser have access to all view.
+    - groupadmin acccess: allow groupadmin to get information of the group they manage. If
+      user is not a admin of the group they try to get, so access is denied.
 
     :param request: Web request
-    :param group: group of the user
+    :param group: group that will be get
+    :param attribute: only get this attribute of the group, used to get member list or
+                      admin user list.
     :return: HTTP rendering
     """
     backend = OpenLdapGroupBackend()
@@ -34,10 +40,13 @@ def json(request, group, attribute):  # pylint: disable=unused-argument
 @groupadmin_required
 def html(request, group):  # pylint: disable=unused-argument
     """
-    Return a HTML rendering for GET request in /groups/*group*
+    HTML rendering for GET request in *uri://groups/group*. It need:
+
+    - superuser account: as superuser have access to all view.
+    - groupadmin access: return the HTML rendering of group edition
 
     :param request: Web request
-    :param group: group
+    :param group: group that will be get
     :return: HTTP rendering
     """
     return render(request, 'groups/group/home.html')

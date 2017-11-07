@@ -1,6 +1,5 @@
 """
-Provide support for all *PUT* method to uri://users/*username*. *PUT* method will allow
-user creation. You will raise AlreadyExist exception if user exist.
+Provide support for **PUT** methods on uri://groups/*group* request.
 """
 from django.http import JsonResponse
 

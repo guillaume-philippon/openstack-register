@@ -1,5 +1,5 @@
 """
-Provide support for uri://groups/*group* call with **DELETE** HTTP method
+Provide support for **DELETE** methods on uri://groups/*group* request.
 """
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
@@ -14,13 +14,17 @@ from registration.Backend.Exceptions import AdminGroupDelete
 @self_protection
 def json(request, group, attribute, value):  # pylint: disable=unused-argument
     """
-    Delete group.
+    It call OpenLdapGroupBackend to delete group or attribute in group.
 
-    :param request: Web request
-    :param group: groupname to delete
-    :param attribute: groupname to delete
-    :param value: groupname to delete
-    :return: JSonResponse
+    If attribute is None, then **group** will be deleted to openldap. Else, we remove **value**
+    entry to group. **attribute** is used to add or remove user into a group.
+
+    :param request: Web request required by @groupadmin_required / @superuser_protection /
+                    @self_protection
+    :param group: group that will be affected
+    :param attribute: attribute that will be affected (if not None)
+    :param value: value that will be affected (if not None)
+    :return: HTTP rendering
     """
     ldap = OpenLdapGroupBackend()
     try:

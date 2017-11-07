@@ -14,8 +14,14 @@ def dispatcher(request, username):
       from registration import api
       api.users.user.dispatcher
 
+    This dispatcher support:
+        - **GET** method: for HTML & JSON rendering
+        - **POST** method: for JSON rendering
+        - **PUT** method: for JSON rendering
+        - **DELETE** method: for JSON rendering
+
     :param request: Web request
-    :param username: username
+    :param username: user that will be involved in action.
     :return: HTTP rendering
     """
     response = None

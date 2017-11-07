@@ -1,5 +1,5 @@
 """
-Provide RESTful API for uri:/users request.
+Provide support for **GET** methods on uri://users/ request.
 """
 from django.shortcuts import render
 from django.http import JsonResponse
