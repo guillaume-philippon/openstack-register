@@ -1,17 +1,17 @@
 """
-Some exceptions we can raise with Backends
+Provide exceptions for registration.Backend module.
 """
 
 
 class AdminGroupDelete(Exception):
     """
-    some desc.
+    Raised when a user try to delete the administrator group.
     """
     pass
 
 
 class NotGroupAttribute(Exception):
     """
-    some desc.
+    Raised when a user try to access to a attribute that not exist
     """
     pass

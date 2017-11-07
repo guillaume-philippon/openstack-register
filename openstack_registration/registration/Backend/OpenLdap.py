@@ -1,5 +1,5 @@
 """
-OpenLdap backend support
+Provide support for openldap backend. It abstract all openldap interaction with pyldap module.
 """
 # -*- coding: utf-8 -*-
 import re
@@ -28,7 +28,8 @@ GROUP_ATTRIBUTES = {
 
 class OpenLdapBackend(object):  # pylint: disable=too-few-public-methods
     """
-    Provide commun tools for OpenLDAP backend support.
+    Base class for openldap interaction. It only provide __init__ method that will be inherent by
+    sub-classes.
     """
     def __init__(self):
         """
@@ -50,14 +51,19 @@ class OpenLdapBackend(object):  # pylint: disable=too-few-public-methods
 
 class OpenLdapUserBackend(OpenLdapBackend):
     """
-    Provide tools to manage user store on LDAP backend.
+    OpenLdapBackend sub-class to manage user openldap storage.
     """
     def get(self, username='*'):
         """
-        Return a list of users based on filter
+        Get user information based on *username* filter. By default, the filter is '*' and get()
+        will return all user informations. It user _ldap_to_dict() private method to format output.
 
-        :param username: username of user we want to get information
-        :return: list or dict
+        As pyldap considere all entry as a list even if they can have only one entry, we reformat
+        it to make it easier to manipulate.
+
+        :param username: filter that will be used. By default, value is '*' and user can change it
+                         for a specific username.
+        :return: list of user
         """
         response = list()
         users = self.connection.search_s(self.base_ou, ldap.SCOPE_SUBTREE,  # pylint: disable=no-member
@@ -69,9 +75,9 @@ class OpenLdapUserBackend(OpenLdapBackend):
 
     def create(self, attributes):
         """
-        Create a ldap user with all their attributes
+        Create user based on attributes.
 
-        :param attributes: User attributes in dict. format
+        :param attributes: user attributes (username / email / firstname / lastname / password)
         :return: void
         """
         user = "uid={username},{user_ou}".format(username=attributes['username'],
@@ -101,10 +107,12 @@ class OpenLdapUserBackend(OpenLdapBackend):
 
     def modify(self, username, attributes):
         """
-        Modify a user attributes
+        Modify user defined by *username*. It will parse all attribute listed in attributes and
+        modify it with the value provieded. If password attribute is empty, then, we let the
+        current password value as it is.
 
-        :param username: username will modify
-        :param attributes: attributes
+        :param username: user that will be modified
+        :param attributes: attributes of the user
         :return: void
         """
         user = 'uid={username},{user_ou}'.format(username=username,
@@ -126,9 +134,9 @@ class OpenLdapUserBackend(OpenLdapBackend):
 
     def delete(self, username):
         """
-        Delete user account
+        Delete the user account defined by *username*.
 
-        :param username: username
+        :param username: user that will be deleted
         :return: void
         """
         user = 'uid={username},{user_ou}'.format(username=username,
@@ -163,15 +171,18 @@ class OpenLdapUserBackend(OpenLdapBackend):
 
 class OpenLdapGroupBackend(OpenLdapBackend):
     """
-    Provide tools to manage a group store on LDAP backend
+    OpenLdapBackend sub-class to manage group openldap storage.
     """
     def get(self, group='*', attribute=None):
         """
-        Return a list of groups based on filter
+        Get group information based on group filter. By default, group filter is '*' to get all
+        groups. If attribute is not None, then we only get *attribute* value of the group.
 
-        :param attribute: If a specific attribute is ask
-        :param group: group filter, by default we get all groups
-        :return: list of dict
+        It use _ldap_to_dict private method to format output to a easier manipulation.
+
+        :param group: filter, by default '*'.
+        :param attribute: target attribute that will be listed
+        :return: list
         """
         response = list()
         if attribute is None:
@@ -188,7 +199,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
 
     def create(self, attributes):
         """
-        Create a group
+        Create a group based on attributes value.
 
         :param attributes: group attributes
         :return: void
@@ -208,11 +219,14 @@ class OpenLdapGroupBackend(OpenLdapBackend):
 
     def delete(self, group, attribute=None, value=None):
         """
-        Delete group entry
+        Delete a group or a group entry. If attribute is None, then the group will be deleted,
+        else, we remove *value* from *attribute*.
 
-        :param group: group name
-        :param attribute: group name
-        :param value: group name
+        It use _ldap_remove_dn_to_list private method to remove entry.
+
+        :param group: name of the group that will be affected
+        :param attribute: attribute that can be affected if defined
+        :param value: value that will be removed if defined
         :return: void
         """
         # If delete is ask for a members or admis, then we just remove the dn of user to member list
@@ -229,11 +243,14 @@ class OpenLdapGroupBackend(OpenLdapBackend):
 
     def modify(self, group, attribute=None, value=None):
         """
-        Modify value of a group.
+        Modify value of a group or a attribute in a group. Currently, only add *value* in
+        *attribute*.
 
-        :param group: group name
-        :param attribute: attribute name
-        :param value: attribute value
+        It use _ldap_add_dn_to_list private method to add a *value* in *attribute*.
+
+        :param group: name of the group that will be affected.
+        :param attribute: that will be affected if defined
+        :param value: value that will be added if defined
         :return:
         """
         if attribute == 'members' or attribute == 'admins':
@@ -242,9 +259,12 @@ class OpenLdapGroupBackend(OpenLdapBackend):
     @staticmethod
     def _ldap_to_dict(attributes):
         """
-        Format ldap output to be compliant with API.
+        return a list of users based on ldap output. By default ldap module return a list of value
+        even there is only one value for the attributes. To make it simple for other
+        openstack-registration module to interact with ldap, we format the output to be a dict of
+        value
 
-        :param attributes: attributes to format
+        :param attributes: ldap attributes to format
         :return: list
         """
         response = dict()
@@ -266,29 +286,28 @@ class OpenLdapGroupBackend(OpenLdapBackend):
 
     def _ldap_add_dn_to_list(self, cn, attribute, uid):  # pylint: disable=invalid-name
         """
-        Add a dn on a list of DN, useful to add a uniqueMember or a owner to a group
+        Add a entry in a openldap group based on attribute.
 
-        :param cn:
-        :param attribute:
-        :param uid:
-        :return:
+        :param cn: commun name of the group
+        :param attribute: attribute name
+        :param uid: uid that will be added to group
+        :return: void
         """
         uid_ldap = 'uid={uid},{user_ou}'.format(uid=uid,
                                                 user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
         cn_ldap = 'cn={cn},{group_ou}'.format(cn=cn,
                                               group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
-        print "Add {} on {} in {}".format(uid_ldap, cn_ldap, GROUP_ATTRIBUTES[attribute])
         self.connection.modify_s(cn_ldap, [(ldap.MOD_ADD,  # pylint: disable=no-member
                                             GROUP_ATTRIBUTES[attribute], uid_ldap)])
 
     def _ldap_remove_dn_to_list(self, cn, attribute, uid):  # pylint: disable=invalid-name
         """
-        Add a dn on a list of DN, useful to add a uniqueMember or a owner to a group
+        Remove a entry in openldap group based on attribute.
 
-        :param cn:
-        :param attribute:
-        :param uid:
-        :return:
+        :param cn: commun name of the group
+        :param attribute: attribute name
+        :param uid: uid that will be added to group
+        :return: void
         """
         uid_ldap = 'uid={uid},{user_ou}'.format(uid=uid,
                                                 user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])

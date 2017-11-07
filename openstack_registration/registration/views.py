@@ -23,7 +23,7 @@ def login(request):
         - **failure**: user is not logged
 
     :param request: Web request
-    :return: JSonResponse
+    :return: HTTP rendering
     """
     # If user is already authenticated, we return a success status
     if request.user.is_authenticated():
@@ -63,9 +63,10 @@ def login(request):
 @login_required()
 def logout(request):
     """
-    Logout user and redirect to login page
+    logout user from application.
+
     :param request: HTTP request
-    :return: HTTP
+    :return: HTTP rendergin
     """
     LOGGER.info("USER LOGOUT    :: User %s is disconnected from %s ",
                 request.user, request.META.get('REMOTE_ADDR'))
@@ -112,7 +113,7 @@ def handler403(request):
 
 def handler500(request):
     """
-    Handle 403 error message
+    Handle 500 error message
 
     :param request: Web request
     :return: HTTP rendering

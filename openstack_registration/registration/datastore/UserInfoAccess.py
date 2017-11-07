@@ -2,6 +2,7 @@
 This module manage interaction between openstack-registration function and models. It provide a
 abstraction of UserInfo model to be easiest to use.
 
+**This module is obsolete as all information is now in openldap backend**
 """
 from registration.models import UserInfo
 from openstack_registration.config import GLOBAL_CONFIG

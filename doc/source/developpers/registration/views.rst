@@ -3,5 +3,5 @@ Registration views
 
 registration.views
 ------------------
-.. automodule::registration.views
+.. automodule:: registration.views
     :members:

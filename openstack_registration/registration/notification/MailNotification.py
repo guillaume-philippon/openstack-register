@@ -1,5 +1,5 @@
 """
-make desc.
+Provide support for mail notification.
 """
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -27,7 +27,8 @@ Openstack Cloud Team
 
 class MailNotification(object):  # pylint: disable=too-few-public-methods
     """
-    Provide needed tools to send a mail notification.
+    Provide support to interact with mail server and let openstack-registration notify user when a
+    account is created.
     """
     def __init__(self):
         """
@@ -46,10 +47,10 @@ class MailNotification(object):  # pylint: disable=too-few-public-methods
 
     def notify(self, user):
         """
-        Sent a mail to user and administrator
+        Sent a mail to user and administrator.
 
-        :param user:
-        :return:
+        :param user: user to notify
+        :return: void
         """
         # create header
         header = MIMEMultipart()
