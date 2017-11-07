@@ -1,5 +1,5 @@
 """
-Provide support for uri://users/*username* call with **DELETE** HTTP method
+Provide support for **DELETE** methods on uri://users/username request.
 """
 from django.http import JsonResponse
 from django.contrib.auth import logout
@@ -11,11 +11,14 @@ from registration.Backend.OpenLdap import OpenLdapUserBackend
 @owner_required
 def json(request, username):
     """
-    Delete user account. We need to be a superuser or user it-self to do it.
+    JSON rendering for uri://users/*username* request. It need:
+
+    - superuser account: as superuser always have access to view
+    - owner account: allow user to delete its account
 
     :param request: Web request
-    :param username: username to delete
-    :return: JSonResponse
+    :param username: user to delete
+    :return: HTTP rendering
     """
     ldap = OpenLdapUserBackend()
     ldap.delete(username)

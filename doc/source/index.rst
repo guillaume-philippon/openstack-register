@@ -11,7 +11,14 @@ Welcome to openstack-registration's documentation!
    :caption: Contents:
 
    developpers/openstack_registration
-   developpers/registration
+   developpers/registration/registration
+   developpers/registration/api
+   developpers/registration/backend
+   developpers/registration/datastore
+   developpers/registration/notification
+   developpers/registration/decorators
+   developpers/registration/exceptions
+   developpers/registration/views
 
 Indices and tables
 ==================

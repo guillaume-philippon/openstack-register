@@ -1,6 +1,5 @@
 """
-Provide support for all *POST* method to uri://users/*username*. *POST* method will allow
-user creation. You will raise AlreadyExist exception if user exist.
+Provide support for **POST** methods on uri://users/username request.
 """
 import ast
 
@@ -13,13 +12,20 @@ from registration.Backend.OpenLdap import OpenLdapUserBackend
 from registration.notification.MailNotification import MailNotification
 
 
-def json(request, username):  # pylint: disable=unused-argument
+def json(request, username):
     """
-    Create a user based on request content and username uri
+    JSON rendering for uri://users/*username* request.
 
-    :param request: Web request
-    :param username: username
-    :return: Json rendering
+    It call OpenLdapUserBackend to create a openldap user and call MailNotification to notify both
+    user and administrator when a new account is created. It also, log the user after creation and
+    redirect him to its own web page.
+
+    As openstack-registration is based on self-created account process, we don't have any access
+    control to this view.
+
+    :param request: Web request which contains user attributes
+    :param username: username that will be used for user.
+    :return: HTTP rendering
     """
     ldap = OpenLdapUserBackend()
     notification = MailNotification()

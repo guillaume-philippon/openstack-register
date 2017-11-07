@@ -1,5 +1,5 @@
 """
-Manage all get method for users REST API
+Provide support for **GET** methods on uri://users/*username* request.
 """
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -11,22 +11,27 @@ from registration.decorators import owner_required
 @owner_required
 def html(request, username):  # pylint: disable=unused-argument
     """
-    Return a HTML rendering for GET request in /users/*username*
+    HTML rendering for uri://users/*username* request. It need:
+
+    - superuser account: as superuser always have access to view
+    - owner access: allow a user to have access to its own attributes
 
     :param request: Web request
-    :param username: username of the user
-    :return: HTTP
+    :param username: required by @owner_required decorator
+    :return: HTTP rendering
     """
     return render(request, 'users/user/home.html')
 
 
 def json(request, username):  # pylint: disable=unused-argument
     """
-    Return a Json rendering for GET request in /users/*username*
+    JSON rendering for uri://users/*username* request. It doesn't have any access control. If a
+    user not exists, we return a json file with status **UserNotExist** it provide a easy way to
+    check if username is available while creating a new account.
 
     :param request: Web request
     :param username: username
-    :return: JsonResponses
+    :return: HTTP rendering
     """
     backend = OpenLdapUserBackend()
     user = backend.get(username=username)
@@ -44,12 +49,15 @@ def json(request, username):  # pylint: disable=unused-argument
 @owner_required
 def user_information(request, username, data):  # pylint: disable=unused-argument
     """
-    To have a easiest permission support, we split user information rendering and we decorate
-    function with @owner_required.
+    To have access control on user information, we call user_information from json function. It
+    need:
+
+    - superuser account: as superuser always have access to view
+    - owner access: allow a user to have access to its own attributes
 
     :param request: required for @owner_required decorator
     :param username: required for @owner_required decorator
-    :param data: required for @owner_required decorator
+    :param data: data that contains user attributes
     :return: HTTP rendering
     """
     return data

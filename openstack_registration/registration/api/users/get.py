@@ -1,5 +1,5 @@
 """
-Provide view that will be call when a uri:/users request will be call
+Provide RESTful API for uri:/users request.
 """
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -11,7 +11,7 @@ from registration.Backend import OpenLdapUserBackend
 @superuser_required
 def html(request):
     """
-    Return the HTML page to display users list
+    HTML rendering for uri://*users*. It need superuser privilegies to access it
 
     :param request: Web request
     :return: HTTP rendering
@@ -23,11 +23,14 @@ def html(request):
 @groupadmin_required
 def json(request):  # pylint: disable=unused-argument
     """
-    Provide a list of user. This view can only be called by a superuser. A PermissionDenied
-    exception is raised if user is not a superuser
+    JSON rendering for uri://*users*. It need:
 
-    :param request: Web request
-    :return: JSonResponse
+    - superuser account: a superuser account always have access to all view
+    - groupadmin access: a group admin is a user that can add / remove user from a group. So, he
+      need to list all users available.
+
+    :param request: required by @groupadmin_required decorator
+    :return: JSON rendering
     """
     ldap = OpenLdapUserBackend()
     return JsonResponse(ldap.get(), safe=None)

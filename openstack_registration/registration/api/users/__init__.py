@@ -1,18 +1,12 @@
 """
-Provide RESTful API for uri://user request based on:
-
-- **method**: (GET / POST / PUT / DELETE)
-- **format**: (json / HTTP)
-
+Provide RESTful API for uri://*users* request.
 """
 from registration.api.users import user as users_user, get as users_get
 
 
 def dispatcher(request, username=None):
     """
-    dispatcher function is defined on __init__ file to avoid some strange call and have a clear call
-    like :
-    .. code: python
+    dispatcher function is defined on __init__ file to allow a clear call like: ::
 
       from registration import api
       api.users.dispatcher

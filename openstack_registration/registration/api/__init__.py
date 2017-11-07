@@ -1,14 +1,15 @@
 """
 API is a module that manage REST API for openstack-registration. The following URI can be used with
-the API
+the API.
 
 API URI:
 
-- **/users**: list of users
-    - **/users/user_id**: a specific user
+- uri://**users**: list of users
+    - uri://**users/user_id**: a specific user
 
-- **/groups**: list of groups
-    - **/groups/group**: a specific group
+- uri://**groups**: list of groups
+    - uri://**groups/group**: a specific group
+        - uri://**groups/group/attribute**: a specific attribute of group
 
 API output format supported:
 

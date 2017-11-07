@@ -1,6 +1,5 @@
 """
-Provide support for all *POST* method to uri://users/*username*. *POST* method will allow
-user creation. You will raise AlreadyExist exception if user exist.
+Provide support for **PUT** methods on uri://users/username request.
 """
 import json as core_json
 
@@ -13,11 +12,16 @@ from registration.Backend.OpenLdap import OpenLdapUserBackend
 @owner_required
 def json(request, username):  # pylint: disable=unused-argument
     """
-    Create a user based on request content and username uri
+    JSON rendering for uri://users/*username* request. It need:
+
+    - superuser account: as superuser always have access to view
+    - owner access: allow user to update its own attributes
+
+    It call OpenLdapUserBackend to modify user entry with data embedded in request.
 
     :param request: Web request
-    :param username: username
-    :return: Json rendering
+    :param username: user that will be modify
+    :return: HTTP rendering
     """
     response = dict()
     ldap = OpenLdapUserBackend()

@@ -1,5 +1,5 @@
 """
-Provide RESTful API for uri://users/*username* request
+Provide RESTful API for uri://users/*username* request.
 """
 from registration.api.users.user import get as user_get
 from registration.api.users.user import post as user_post
@@ -9,9 +9,7 @@ from registration.api.users.user import delete as user_delete
 
 def dispatcher(request, username):
     """
-    dispatcher function is defined on __init__ file to avoid some strange call and have a clear call
-    like :
-    .. code: python
+    dispatcher function is defined on __init__ file to allow a clear call like: ::
 
       from registration import api
       api.users.user.dispatcher
