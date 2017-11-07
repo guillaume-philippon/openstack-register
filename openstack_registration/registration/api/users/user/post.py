@@ -2,8 +2,12 @@
 Provide support for all *POST* method to uri://users/*username*. *POST* method will allow
 user creation. You will raise AlreadyExist exception if user exist.
 """
+import ast
+
 from django.http import JsonResponse
 from django.contrib import auth
+
+from openstack_registration.config import GLOBAL_CONFIG
 
 from registration.Backend.OpenLdap import OpenLdapUserBackend
 from registration.notification.MailNotification import MailNotification
@@ -28,7 +32,8 @@ def json(request, username):  # pylint: disable=unused-argument
         'email': request.POST['email']
     }
     ldap.create(attributes)
-    # notification.notify(attributes)
+    if ast.literal_eval(GLOBAL_CONFIG['MAIL_ENABLE']):
+        notification.notify(attributes)
 
     # After creating the user, we automaticaly logged him
     user = auth.authenticate(username=username,

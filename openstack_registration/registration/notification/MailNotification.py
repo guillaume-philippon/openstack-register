@@ -4,7 +4,7 @@ make desc.
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from smtplib import SMTP
+from smtplib import SMTP, SMTP_SSL
 
 from openstack_registration.config import GLOBAL_CONFIG
 
@@ -36,6 +36,12 @@ class MailNotification(object):  # pylint: disable=too-few-public-methods
         self.server = GLOBAL_CONFIG['MAIL_SERVER']
         self.from_header = GLOBAL_CONFIG['MAIL_FROM']
         self.bcc_header = GLOBAL_CONFIG['MAIL_ADMIN']
+        if 'MAIL_USERNAME' in GLOBAL_CONFIG:
+            self.smtp = SMTP_SSL(self.server)
+            self.smtp.login(GLOBAL_CONFIG['MAIL_USERNAME'],
+                            GLOBAL_CONFIG['MAIL_PASSWORD'])
+        else:
+            self.smtp = SMTP(self.server)
         self.subject = "Openstack Registration Message"
 
     def notify(self, user):
@@ -55,6 +61,4 @@ class MailNotification(object):  # pylint: disable=too-few-public-methods
         recipients = GLOBAL_CONFIG['MAIL_ADMIN'].split(',') + [user['email']]
 
         # connect to mail server and send the email
-        connection = SMTP(self.server, 25)
-        connection.sendmail(GLOBAL_CONFIG['MAIL_FROM'], recipients, header.as_string())
-        connection.quit()
+        self.smtp.sendmail(GLOBAL_CONFIG['MAIL_FROM'], recipients, header.as_string())

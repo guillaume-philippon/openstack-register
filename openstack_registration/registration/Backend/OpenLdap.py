@@ -80,7 +80,6 @@ class OpenLdapUserBackend(OpenLdapBackend):
         # must be give as a list of tuple and value must always be a list.
         # We also need to for str for attributes as there are some strange unicode issue.
         # We also need to encode the password.
-        # TODO: Make ajax request must give a encoded password, we should not have the plain one.
         user_attributes = [
             ('objectClass', ['organizationalPerson', 'person', 'inetOrgPerson', 'top']),
             ('uid', [str(attributes['username'])]),

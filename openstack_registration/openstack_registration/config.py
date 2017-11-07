@@ -34,6 +34,8 @@ GLOBAL_CONFIG = {
     'REGISTRATION_URL': 'http://127.0.0.1',
 
     # [mailing]
+    'MAIL_ENABLE': 'True',
+    'MAIL_ADMIN': 'openstack-admin@example.com',
     'MAIL_FROM': 'no-reply@example.com'
 }
 """
@@ -73,15 +75,21 @@ MAIN_OPTIONS = {
 """
 
 MAILING_OPTIONS = {
+    'MAIL_ENABLE': 'enable',
     'MAIL_ADMIN': 'admin',
     'MAIL_FROM': 'from',
-    'MAIL_SERVER': 'server'
+    'MAIL_SERVER': 'server',
+    'MAIL_USERNAME': 'username',
+    'MAIL_PASSWORD': 'password'
 }
 """
 
+    - **MAIL_ENABLE**: mail of administrators (file options: *admin*)
     - **MAIL_ADMIN**: mail of administrators (file options: *admin*)
     - **MAIL_FROM**: mail From field when mail will be sent (file options: *from*)
     - **MAIL_SERVER**: smtp server (file option: *server*)
+    - **MAIL_USERNAME**: smtp server (file option: *server*)
+    - **MAIL_PASSWORD**: smtp server (file option: *server*)
 
 """
 
