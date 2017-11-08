@@ -8,6 +8,8 @@ from registration.api.groups.group import get as group_get, \
     delete as group_delete, \
     put as group_put
 
+from openstack_registration.settings import LOGGER
+
 
 def dispatcher(request, group, attribute, value):
     """
@@ -28,7 +30,8 @@ def dispatcher(request, group, attribute, value):
     :param value: Defined if request like *uri://groups/group/attribute/value*
     :return: HTTP rendering
     """
-    response = None
+    LOGGER.debug('registration.api.groups.group.dispatcher: %s uri:/%s',
+                 request.method, request.path_info)
     if request.method == 'GET':
         if 'format' in request.GET and request.GET['format'] == 'json':
             response = group_get.json(request, group=group, attribute=attribute)

@@ -6,6 +6,8 @@ from registration.api.users.user import post as user_post
 from registration.api.users.user import put as user_put
 from registration.api.users.user import delete as user_delete
 
+from openstack_registration.settings import LOGGER
+
 
 def dispatcher(request, username):
     """
@@ -24,6 +26,8 @@ def dispatcher(request, username):
     :param username: user that will be involved in action.
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.users.user.dispatcher: %s uri:/%s',
+                 request.method, request.path_info)
     response = None
     if request.method == "GET":
         if 'format' in request.GET and request.GET['format'] == 'json':

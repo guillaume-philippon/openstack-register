@@ -4,6 +4,8 @@ Provide support for **GET** methods on uri://groups/*group* request.
 from django.shortcuts import render
 from django.http import JsonResponse
 
+from openstack_registration.settings import LOGGER
+
 from registration.Backend import OpenLdapGroupBackend
 from registration.decorators import groupadmin_required
 
@@ -24,6 +26,8 @@ def json(request, group, attribute):  # pylint: disable=unused-argument
                       admin user list.
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.groups.group.get.json: %s access to %s',
+                 request.user.get_username(), group)
     backend = OpenLdapGroupBackend()
     group = backend.get(group=group, attribute=attribute)
     # If the response is empty, then when want to create a new user. So we load register page

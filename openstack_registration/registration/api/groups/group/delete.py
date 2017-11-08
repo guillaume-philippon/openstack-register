@@ -4,6 +4,8 @@ Provide support for **DELETE** methods on uri://groups/*group* request.
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 
+from openstack_registration.settings import LOGGER
+
 from registration.decorators import groupadmin_required, superuser_protection, self_protection
 from registration.Backend.OpenLdap import OpenLdapGroupBackend
 from registration.Backend.Exceptions import AdminGroupDelete
@@ -26,6 +28,8 @@ def json(request, group, attribute, value):  # pylint: disable=unused-argument
     :param value: value that will be affected (if not None)
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.groups.group.delete.json: %s access to %s',
+                 request.user.get_username(), group)
     ldap = OpenLdapGroupBackend()
     try:
         ldap.delete(group, attribute, value)

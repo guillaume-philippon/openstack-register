@@ -7,11 +7,13 @@ from django.http import JsonResponse
 from registration.Backend import OpenLdapUserBackend
 from registration.decorators import owner_required
 
+from openstack_registration.settings import LOGGER
+
 
 @owner_required
-def html(request, username):  # pylint: disable=unused-argument
+def html(request, username):
     """
-    HTML rendering for uri://users/*username* request. It need:
+    HTML rendering for GET uri://users/*username* request. It need:
 
     - superuser account: as superuser always have access to view
     - owner access: allow a user to have access to its own attributes
@@ -20,12 +22,14 @@ def html(request, username):  # pylint: disable=unused-argument
     :param username: required by @owner_required decorator
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.users.user.get.html: %s access to %s',
+                 request.user.get_username(), username)
     return render(request, 'users/user/home.html')
 
 
-def json(request, username):  # pylint: disable=unused-argument
+def json(request, username):
     """
-    JSON rendering for uri://users/*username* request. It doesn't have any access control. If a
+    JSON rendering for GET uri://users/*username* request. It doesn't have any access control. If a
     user not exists, we return a json file with status **UserNotExist** it provide a easy way to
     check if username is available while creating a new account.
 
@@ -33,6 +37,8 @@ def json(request, username):  # pylint: disable=unused-argument
     :param username: username
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.users.user.get.json: %s access to %s',
+                 request.user.get_username(), username)
     backend = OpenLdapUserBackend()
     user = backend.get(username=username)
     # If the response is empty, then when want to create a new user. So we load register page
@@ -47,7 +53,7 @@ def json(request, username):  # pylint: disable=unused-argument
 
 
 @owner_required
-def user_information(request, username, data):  # pylint: disable=unused-argument
+def user_information(request, username, data):
     """
     To have access control on user information, we call user_information from json function. It
     need:
@@ -60,4 +66,6 @@ def user_information(request, username, data):  # pylint: disable=unused-argumen
     :param data: data that contains user attributes
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.users.user.put.user_information: %s access to %s',
+                 request.user.get_username(), username)
     return data

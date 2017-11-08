@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.contrib import auth
 
 from openstack_registration.config import GLOBAL_CONFIG
+from openstack_registration.settings import LOGGER
 
 from registration.Backend.OpenLdap import OpenLdapUserBackend
 from registration.notification.MailNotification import MailNotification
@@ -14,7 +15,7 @@ from registration.notification.MailNotification import MailNotification
 
 def json(request, username):
     """
-    JSON rendering for uri://users/*username* request.
+    JSON rendering for POST uri://users/*username* request.
 
     It call OpenLdapUserBackend to create a openldap user and call MailNotification to notify both
     user and administrator when a new account is created. It also, log the user after creation and
@@ -27,6 +28,8 @@ def json(request, username):
     :param username: username that will be used for user.
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.users.user.post.json: %s',
+                 username)
     ldap = OpenLdapUserBackend()
     notification = MailNotification()
 

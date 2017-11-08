@@ -3,6 +3,8 @@ Provide RESTful API for uri://*users* request.
 """
 from registration.api.users import user as users_user, get as users_get
 
+from openstack_registration.settings import LOGGER
+
 
 def dispatcher(request, username=None):
     """
@@ -19,6 +21,8 @@ def dispatcher(request, username=None):
     :param username: Defined if we have a request like *uri://users/username*
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.users.dispatcher: %s uri:/%s',
+                 request.method, request.path_info)
     response = None
     if username is not None:
         response = users_user.dispatcher(request, username=username)

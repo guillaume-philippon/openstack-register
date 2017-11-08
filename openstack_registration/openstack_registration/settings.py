@@ -18,7 +18,6 @@ import ldap
 
 from django_auth_ldap.config import LDAPSearch, GroupOfUniqueNamesType
 
-from openstack_registration.utils import create_logger, create_logger_error
 from openstack_registration.config import GLOBAL_CONFIG, load_config
 
 
@@ -136,11 +135,37 @@ LOGIN_URL = '/login'
 LOGOUT_URL = '/logout:'
 LOGIN_REDIRECT_URL = '/'
 STATIC_URL = '/static/'
-# MEDIA_URL = 'js/'
 
-LOGGING_MODE = 'both'
-LOGGER = create_logger(LOGGING_MODE, stream_level=logging.DEBUG)
-LOGGER_ERROR = create_logger_error(LOGGING_MODE, stream_level=logging.DEBUG)
+# Logging configuration. A very basic one.
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(asctime)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'django': {
+            'level': GLOBAL_CONFIG['DJANGO_LOGLEVEL'],
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(GLOBAL_CONFIG['LOG_DIR'], 'registration.log'),
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['django'],
+            'level': GLOBAL_CONFIG['DJANGO_LOGLEVEL'],
+            'propagate': True,
+        }
+    }
+}
+
+LOGGER = logging.getLogger('django')
+
+# Authentification base on ldap
 
 AUTH_LDAP_SERVER_URI = GLOBAL_CONFIG['LDAP_SERVER']
 AUTH_LDAP_BIND_DN = GLOBAL_CONFIG['LDAP_USER']

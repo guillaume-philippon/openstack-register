@@ -3,6 +3,8 @@ Provide RESTful API for uri://*groups* request.
 """
 from registration.api.groups import group as groups_group, get as groups_get
 
+from openstack_registration.settings import LOGGER
+
 
 def dispatcher(request, group=None, attribute=None, value=None):
     """
@@ -21,6 +23,8 @@ def dispatcher(request, group=None, attribute=None, value=None):
     :param value: Defined if we have a request like *uri://groups/group/attribute/value*
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.groups.dispatcher: %s uri:/%s',
+                 request.method, request.path_info)
     response = None
     if group is not None:
         response = groups_group.dispatcher(request, group=group, attribute=attribute, value=value)

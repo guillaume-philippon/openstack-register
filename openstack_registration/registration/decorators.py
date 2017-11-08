@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from registration.Backend.OpenLdap import OpenLdapGroupBackend
 
 from openstack_registration.config import GLOBAL_CONFIG
+from openstack_registration.settings import LOGGER
 
 
 def owner_required(view):
@@ -34,6 +35,8 @@ def owner_required(view):
                 or user == GLOBAL_CONFIG['ADMIN_UID']:
             return view(request, *args, **kwargs)
         else:
+            LOGGER.warning('Owner required: %s try to access to %s with method %s',
+                           user, request.path_info, request.method)
             raise PermissionDenied
     wrap.__doc__ = view.__doc__
     wrap.__name__ = view.__name__
@@ -60,6 +63,8 @@ def superuser_required(view):
         if request.user.is_superuser:
             return view(request, *args, **kwargs)
         else:
+            LOGGER.warning('Superuser required: %s try to access to %s with method %s',
+                           request.user.get_username(), request.path_info, request.method)
             raise PermissionDenied
     wrap.__doc__ = view.__doc__
     wrap.__name__ = view.__name__
@@ -101,6 +106,8 @@ def groupadmin_required(view):
                     if request.user.get_username() in group_index['admins']:
                         return view(request, *args, **kwargs)
         # at the end, if nothing match, we raise a PermissionDenied
+        LOGGER.warning('Groupadmin required: %s try to access to %s with method %s',
+                       request.user.get_username(), request.path_info, request.method)
         raise PermissionDenied
     wrap.__doc__ = view.__doc__
     wrap.__name__ = view.__name__
@@ -126,7 +133,8 @@ def superuser_protection(view):
         """
         if ('attribute' in kwargs or kwargs['attribute'] is None) \
                 and not request.user.is_superuser:
-            print "exception"
+            LOGGER.warning('Superuser protection: %s try access to %s with method %s',
+                           request.user.get_username(), request.path_info, request.method)
             raise PermissionDenied
         return view(request, *args, **kwargs)
     wrap.__doc__ = view.__doc__
@@ -144,7 +152,7 @@ def self_protection(view):
     @wraps(view)
     def wrap(request, *args, **kwargs):
         """
-        Wrapper funcion
+        Wrapper function
 
         :param request: Web request
         :param args: package view function arguments as a list
@@ -152,6 +160,8 @@ def self_protection(view):
         :return: function
         """
         if 'value' in kwargs and kwargs['value'] == request.user.get_username():
+            LOGGER.warning('Self Protection: %s try to access to %s with method %s',
+                           request.user.get_username(), request.path_info, request.method)
             raise PermissionDenied
         return view(request, *args, **kwargs)
     wrap.__doc__ = view.__doc__

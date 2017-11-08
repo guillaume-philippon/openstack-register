@@ -7,12 +7,12 @@ import re
 import ldap
 import ldap.sasl
 
-from registration.Backend.Exceptions import AdminGroupDelete
+from openstack_registration.config import GLOBAL_CONFIG
+from openstack_registration.settings import LOGGER
 
+from registration.Backend.Exceptions import AdminGroupDelete
 from registration.utils import encode_password
 from registration.exceptions import InvalidX500DN
-
-from openstack_registration.config import GLOBAL_CONFIG
 
 # Some regular expression to format ldap output
 USER_LDAP_REGEXP = r"uid=(.*),{user_ou}".format(user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
@@ -46,7 +46,7 @@ class OpenLdapBackend(object):  # pylint: disable=too-few-public-methods
         try:
             self.connection.simple_bind_s(self.user, self.password)
         except:  # pylint: disable=bare-except
-            print 'error during openLdap connection'
+            LOGGER.warning('OpenLdapBackend: Error during openldap connection')
 
 
 class OpenLdapUserBackend(OpenLdapBackend):
@@ -71,6 +71,7 @@ class OpenLdapUserBackend(OpenLdapBackend):
                                          ['uid', 'mail', 'givenName', 'sn', 'cn', 'pager'])
         for _, attributes in users:
             response.append(self._ldap_to_dict(attributes))
+        LOGGER.debug('Get user information: %s', response)
         return response
 
     def create(self, attributes):
@@ -99,11 +100,10 @@ class OpenLdapUserBackend(OpenLdapBackend):
             ('pager', ['514'])
         ]
         try:
+            LOGGER.info('User %s is created with attributes %s', user, attributes)
             self.connection.add_s(user, user_attributes)
         except ldap.INVALID_SYNTAX:  # pylint: disable=no-member
             raise InvalidX500DN('')
-        except ldap.SERVER_DOWN:  # pylint: disable=no-member
-            pass
 
     def modify(self, username, attributes):
         """
@@ -130,6 +130,7 @@ class OpenLdapUserBackend(OpenLdapBackend):
                     password = str(encode_password(unicode(attributes[attribute])
                                                    .encode(encoding='utf-8')))
                     ldif.append((ldap.MOD_REPLACE, 'userPassword', password))  # pylint: disable=no-member
+        LOGGER.info('User %s is modify with attributes %s', user, attributes)
         self.connection.modify_s(user, ldif)
 
     def delete(self, username):
@@ -141,6 +142,7 @@ class OpenLdapUserBackend(OpenLdapBackend):
         """
         user = 'uid={username},{user_ou}'.format(username=username,
                                                  user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
+        LOGGER.info('User %s is deleted', user)
         self.connection.delete_s(user)
 
     @staticmethod
@@ -195,6 +197,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
                                           output)
         for _, attributes in groups:
             response.append(self._ldap_to_dict(attributes))
+        LOGGER.debug('Group %s information: %s', group, response)
         return response
 
     def create(self, attributes):
@@ -215,6 +218,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
             ('owner', user),
             ('description', str(attributes['description']))
         ]
+        LOGGER.info('Group %s created with attributes %s', group, attributes)
         self.connection.add_s(group, group_attributes)
 
     def delete(self, group, attribute=None, value=None):
@@ -231,6 +235,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         """
         # If delete is ask for a members or admis, then we just remove the dn of user to member list
         if attribute == 'members' or attribute == 'admins':
+            LOGGER.info('Group %s delete %s/%s', group, attribute, value)
             self._ldap_remove_dn_to_list(group, attribute, value)
         else:
             # If groupname is LDAP_ADMIN_GROUP we refuse to remove it
@@ -239,6 +244,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
             group_ldap = 'cn={group_name},{group_ou}' \
                          ''.format(group_name=group,
                                    group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+            LOGGER.info('Group %s deleted', group)
             self.connection.delete_s(group_ldap)
 
     def modify(self, group, attribute=None, value=None):
@@ -254,6 +260,7 @@ class OpenLdapGroupBackend(OpenLdapBackend):
         :return:
         """
         if attribute == 'members' or attribute == 'admins':
+            LOGGER.info('Group %s add %s/%s', group, attribute, value)
             self._ldap_add_dn_to_list(group, attribute, value)
 
     @staticmethod

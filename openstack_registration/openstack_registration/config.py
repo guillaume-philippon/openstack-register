@@ -27,6 +27,7 @@ GLOBAL_CONFIG = {
 
     # [django]
     'DJANGO_SECRET_KEY': 'This should be change',  # Should be declare to allow doc generation
+    'DJANGO_LOGLEVEL': 'INFO',  # Should be declare to allow doc generation
 
     # [main]
     'DEBUG_LVL': '1',
@@ -94,7 +95,8 @@ MAILING_OPTIONS = {
 """
 
 DJANGO_OPTIONS = {
-    'DJANGO_SECRET_KEY': 'secret_key'
+    'DJANGO_SECRET_KEY': 'secret_key',
+    'DJANGO_LOGLEVEL': 'loglevel',
 }
 """
 
@@ -105,7 +107,8 @@ DJANGO_OPTIONS = {
 SECTIONS = {
     'auth': AUTH_OPTIONS,
     'main': MAIN_OPTIONS,
-    'mailing': MAILING_OPTIONS
+    'mailing': MAILING_OPTIONS,
+    'django': DJANGO_OPTIONS
 }
 """
 **SECTION** provide the list of options (per section) that will be parsed to load the configuration.

@@ -3,15 +3,12 @@ View module manage interface between user and openstack-registration. It provide
 on REST good practice.
 """
 # -*- coding: utf-8 -*-
-import logging
-
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 
-LOGGER = logging.getLogger("registration")
-LOGGER_ERROR = logging.getLogger("registration_error")
+from openstack_registration.settings import LOGGER
 
 
 def login(request):
@@ -37,21 +34,22 @@ def login(request):
         # If user is not None, then user is authenticated
         if user is not None:
             auth.login(request, user)
-            LOGGER.info("USER LOGIN     :: User %s is connected from %s",
+            LOGGER.info("%s connected from %s",
                         request.user, request.META.get('REMOTE_ADDR'))
             response = JsonResponse({
                 'status': 'success'
             })
         # else the username or password is invalid
         else:
-            LOGGER.info("LOGIN FAILED   :: Attempt to login with user '%s' from %s",
-                        request.POST['username'], request.META.get('REMOTE_ADDR'))
+            LOGGER.warning("Attempt to login with user %s from %s",
+                           request.POST['username'], request.META.get('REMOTE_ADDR'))
             response = JsonResponse({
                 'status': 'failure',
                 'message': 'invalid username or password'
             })
     # If it s not a POST method, it s not supported by the view
     else:
+        LOGGER.info('method %s is not supported by login view', request.method)
         response = JsonResponse({
             'status': 'failure',
             'message': 'method {method} is not supported on login'
@@ -68,7 +66,7 @@ def logout(request):
     :param request: HTTP request
     :return: HTTP rendergin
     """
-    LOGGER.info("USER LOGOUT    :: User %s is disconnected from %s ",
+    LOGGER.info("%s disconnect from %s ",
                 request.user, request.META.get('REMOTE_ADDR'))
     auth.logout(request)
     return redirect('/')
@@ -106,7 +104,6 @@ def handler403(request):
     :param request: Web request
     :return: HTTP rendering
     """
-    print 'test'
     response = render(request, 'error/handler403.html', status=403)
     return response
 

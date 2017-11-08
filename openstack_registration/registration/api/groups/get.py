@@ -7,6 +7,8 @@ from django.http import JsonResponse
 from registration.decorators import groupadmin_required
 from registration.Backend import OpenLdapGroupBackend
 
+from openstack_registration.settings import LOGGER
+
 
 @groupadmin_required
 def html(request):
@@ -35,5 +37,6 @@ def json(request):  # pylint: disable=unused-argument
     :param request: required for @groupadmin_required decorators
     :return: HTTP rendering
     """
+    LOGGER.debug('%s get whole list of groups', request.user.get_username())
     ldap = OpenLdapGroupBackend()
     return JsonResponse(ldap.get(), safe=None)

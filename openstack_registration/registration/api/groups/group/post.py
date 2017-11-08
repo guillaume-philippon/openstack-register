@@ -3,6 +3,8 @@ Provide support for **POST** methods on uri://groups/*group* request.
 """
 from django.http import JsonResponse
 
+from openstack_registration.settings import LOGGER
+
 from registration.decorators import superuser_required
 from registration.Backend.OpenLdap import OpenLdapGroupBackend
 
@@ -21,6 +23,8 @@ def json(request, group):  # pylint: disable=unused-argument
     :param group: that will be created
     :return: HTTP rendering
     """
+    LOGGER.debug('registration.api.groups.group.post.json: %s access to %s',
+                 request.user.get_username(), group)
     ldap = OpenLdapGroupBackend()
 
     attributes = {
