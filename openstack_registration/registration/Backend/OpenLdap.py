@@ -10,13 +10,15 @@ import ldap.sasl
 from openstack_registration.config import GLOBAL_CONFIG
 from openstack_registration.settings import LOGGER
 
-from registration.Backend.Exceptions import AdminGroupDelete
+from registration.Backend.Exceptions import AdminGroupDelete, NotValidPassword, NotValidEmail
 from registration.utils import encode_password
 from registration.exceptions import InvalidX500DN
 
 # Some regular expression to format ldap output
 USER_LDAP_REGEXP = r"uid=(.*),{user_ou}".format(user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
 GROUP_LDAP_REGEXP = r"cn=(.*),{group_ou}".format(group_ou=GLOBAL_CONFIG['LDAP_GROUP_OU'])
+EMAIL_REGEXP = r"([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+"
+PASSWORD_REGEXP = r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*).{8,}"
 
 GROUP_ATTRIBUTES = {
     'admins': 'owner',
@@ -83,6 +85,14 @@ class OpenLdapUserBackend(OpenLdapBackend):
         """
         user = "uid={username},{user_ou}".format(username=attributes['username'],
                                                  user_ou=GLOBAL_CONFIG['LDAP_USER_OU'])
+        # Before adding a user, we check if password is strong enough and if email
+        # have a valid format.
+        if not re.match(PASSWORD_REGEXP, attributes['password']):
+            LOGGER.debug('Password %s not match REGEXP %s', attributes['password'], PASSWORD_REGEXP)
+            raise NotValidEmail
+        if not re.match(EMAIL_REGEXP, attributes['email']):
+            LOGGER.debug('Email %s not match REGEXP %s', attributes['email'], EMAIL_REGEXP)
+            raise NotValidEmail
         # We generate the "ldif-like" entry. ldap module need to have a specific format, entries
         # must be give as a list of tuple and value must always be a list.
         # We also need to for str for attributes as there are some strange unicode issue.

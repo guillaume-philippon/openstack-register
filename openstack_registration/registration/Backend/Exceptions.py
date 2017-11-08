@@ -15,3 +15,17 @@ class NotGroupAttribute(Exception):
     Raised when a user try to access to a attribute that not exist
     """
     pass
+
+
+class NotValidPassword(Exception):
+    """
+    Raised when a password is too weak
+    """
+    pass
+
+
+class NotValidEmail(Exception):
+    """
+    Raised when a password is too weak
+    """
+    pass
