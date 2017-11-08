@@ -11,7 +11,7 @@
 {% block javascript %}{% endblock %}
 
 {% block content %}
-
+<div class="col-sm-8">
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title">User Information (<span id="username-info"></span>)</h3>
@@ -27,25 +27,26 @@
       </div>
       <br/>
       <div class="row">
-          <div class="col-sm-6">
+          <div class="col-sm-12">
               <strong>Email Adress</strong>: <span id="email-info"></span>
           </div>
-          <div class="col-sm-6 row">
-              <div class="col-sm-6">
-                  <a class="btn btn-primary col-sm-12" onclick="openEditInfoModal()">
-                      <span class="glyphicon glyphicon-edit"></span>
-                  </a>
-              </div>
-              <div class="col-sm-6">
-                  <a class="btn btn-danger col-sm-12" onclick="openDeleteModal()">
-                      <span class="glyphicon glyphicon-trash"></span>
-                  </a>
-              </div>
+      </div>
+      <br/>
+      <div class="row text-center">
+          <div class="col-sm-2 col-sm-offset-4">
+              <a class="btn btn-primary col-sm-12" onclick="openEditInfoModal()">
+                  <span class="glyphicon glyphicon-edit"></span>
+              </a>
+          </div>
+          <div class="col-sm-2">
+              <a class="btn btn-danger col-sm-12" onclick="openDeleteModal()">
+                  <span class="glyphicon glyphicon-trash"></span>
+              </a>
           </div>
       </div>
   </div>
 </div>
-
+</div>
 {% include "users/user/modify.html" %}
 {% include "users/user/delete.html" %}
 
